@@ -1,40 +1,20 @@
-from pathlib import Path
-from .storage import load_json, save_json
-
-ROUTES_PATH = Path("data/routes.json")
+from .supabase_client import supabase
 
 def get_routes():
-    return load_json(ROUTES_PATH)
+    res = supabase.table("routes").select("*").execute()
+    return res.data
 
 def add_route(name, grade, color):
-    routes = get_routes()
-    new_id = max([r["id"] for r in routes], default=0) + 1
-
-    route = {
-        "id": new_id,
+    res = supabase.table("routes").insert({
         "name": name,
         "grade": grade,
-        "color": color,
-        "archived": False
-    }
-
-    routes.append(route)
-    save_json(ROUTES_PATH, routes)
-    return route
+        "color": color
+    }).execute()
+    return res.data[0]
 
 def update_route(route_id, **fields):
-    routes = get_routes()
-    for route in routes:
-        if route["id"] == route_id:
-            route.update(fields)
-            save_json(ROUTES_PATH, routes)
-            return route
-    return None
+    res = supabase.table("routes").update(fields).eq("id", route_id).execute()
+    return res.data[0] if res.data else None
 
 def delete_route(route_id):
-    routes = get_routes()
-    new_routes = [r for r in routes if r["id"] != route_id]
-    save_json(ROUTES_PATH, new_routes)
-
-def archive_route(route_id):
-    return update_route(route_id, archived=True)
+    supabase.table("routes").delete().eq("id", route_id).execute()

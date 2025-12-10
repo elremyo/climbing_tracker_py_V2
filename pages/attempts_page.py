@@ -1,9 +1,11 @@
 import streamlit as st
 from utils.routes import get_routes
 from utils.attempts import get_attempts, add_attempt
-from datetime import date
+from datetime import date, datetime
+from utils.constants import ROUTE_COLORS
 
-st.title("🎯 Gestion des tentatives")
+
+st.title("🎯 Mes tentatives")
 
 # Initialisation des flags session_state
 if "show_attempt_form" not in st.session_state:
@@ -12,17 +14,6 @@ if "show_attempt_success" not in st.session_state:
     st.session_state.show_attempt_success = False
 
 routes = get_routes()
-
-# --- Historique des tentatives ---
-st.subheader("Historique des tentatives")
-attempts = get_attempts()
-if attempts:
-    for a in attempts:
-        route_name = next((r['name'] for r in routes if r['id'] == a['route_id']), "Voie supprimée")
-        status = "✅ Réussie" if a.get("success") else "❌ Échouée"
-        st.write(f"{a['date']} — {route_name} — {status} — {a.get('notes','')}")
-else:
-    st.info("Aucune tentative enregistrée.")
 
 # --- Bouton pour afficher le formulaire ---
 if st.button("➕ Ajouter une tentative"):
@@ -67,3 +58,45 @@ if st.session_state.show_attempt_form:
 if st.session_state.show_attempt_success:
     st.success("Tentative enregistrée !")
     st.session_state.show_attempt_success = False
+
+
+# --- Historique des tentatives ---
+attempts = get_attempts()
+if attempts:
+    for a in attempts:
+
+        # --- Récup infos de la voie ---
+        route = next((r for r in routes if r['id'] == a['route_id']), None)
+        if route:
+            route_name = route["name"]
+            route_color = ROUTE_COLORS.get(route["color"], "❓")
+            route_grade = route["grade"]
+        else:
+            route_name = "Voie supprimée"
+            route_color = "❓"
+            route_grade = ""
+
+        # --- Format date JJ/MM/AA ---
+        try:
+            date_obj = datetime.fromisoformat(a["date"])
+            date_str = date_obj.strftime("%d/%m/%y")
+        except:
+            date_str = a["date"]  # fallback si format inattendu
+
+        # --- Status ---
+        status = "✅ Réussie" if a.get("success") else "❌ Échouée"
+
+        # --- Notes : si vide → on n'affiche rien du tout ---
+        notes = a.get("notes")
+        if notes and notes.strip():
+            notes_display = f" — *{notes}*"
+        else:
+            notes_display = ""
+
+        # --- affichage ---
+        st.markdown(
+            f"{date_str} — {route_color} **{route_grade} {route_name}** — {status}{notes_display}"
+        )
+
+else:
+    st.info("Aucune tentative enregistrée.")

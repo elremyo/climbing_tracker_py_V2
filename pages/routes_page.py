@@ -2,7 +2,9 @@ import streamlit as st
 from utils.routes import get_routes, add_route, update_route, delete_route
 from utils.constants import ROUTE_COLORS, GRADES
 
-st.title("🧗 Mes voies")
+routes = get_routes()
+
+st.subheader(f"🧗 Mes voies ({len(routes)})")
 
 # Initialisation des flags session_state
 if "show_form" not in st.session_state:
@@ -97,7 +99,6 @@ def display_route_form_edit(route):
                 st.rerun()
 
 # --- Liste des voies ---
-routes = get_routes()
 if routes:
     for route in routes:
         color_emoji = ROUTE_COLORS.get(route["color"], "❓")

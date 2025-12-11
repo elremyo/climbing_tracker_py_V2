@@ -4,19 +4,14 @@ import streamlit as st
 st.set_page_config(
     page_title="Climbing Tracker",
     page_icon="🧗",
-    layout="wide",
-    menu_items={
-        'Get Help': 'https://www.extremelycoolapp.com/help',
-        'Report a bug': "https://www.extremelycoolapp.com/bug",
-        'About': "# This is a header. This is an *extremely* cool app!"
-    }
+    layout="wide"
 )
 
-st.header("Header")
+st.header("Header",anchor=False, divider="orange", text_alignment="center",width="content")
 
 # définition des pages
 pages = [
-st.Page("pages/dashboard_page.py", title="Tableau de bord", icon="📊"),
+    st.Page("pages/dashboard_page.py", title="Tableau de bord", icon="📊"),
     st.Page("pages/routes_page.py", title="Voies", icon="🧗"),
     st.Page("pages/attempts_page.py", title="Tentatives", icon="🎯")
 ]

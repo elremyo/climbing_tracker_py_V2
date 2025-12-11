@@ -17,7 +17,10 @@ st.markdown("""
             """, unsafe_allow_html=True)
 
 
-st.title("🎯 Mes tentatives")
+attempts = get_attempts()
+routes = get_routes()
+
+st.subheader(f"🎯 Mes tentatives ({len(attempts)})")
 
 # Initialisation des flags session_state
 if "show_attempt_form" not in st.session_state:
@@ -25,7 +28,6 @@ if "show_attempt_form" not in st.session_state:
 if "show_attempt_success" not in st.session_state:
     st.session_state.show_attempt_success = False
 
-routes = get_routes()
 
 # --- Bouton pour afficher le formulaire ---
 if st.button("➕ Ajouter une tentative", key="add_attempt_button"):
@@ -111,7 +113,6 @@ def display_attempt_form_edit(attempt):
 
 
 # --- Historique des tentatives ---
-attempts = get_attempts()
 if attempts:
     for a in attempts:
 

@@ -1,8 +1,13 @@
 from .supabase_client import supabase
 
 def get_routes():
-    res = supabase.table("routes").select("*").execute()
-    return res.data
+    res = (supabase
+           .table("routes")
+           .select("*")
+           .order("grade", desc=True)
+           .execute()
+    )
+    return res.data if res.data else []
 
 def add_route(name, grade, color):
     res = supabase.table("routes").insert({

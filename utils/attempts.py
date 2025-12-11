@@ -34,7 +34,7 @@ def add_attempt(route_id, success, notes="", attempt_date=None):
     res = supabase.table("attempts").insert(data).execute()
     return res.data[0]
 
-def edit_attempt(attempt_id, route_id, success, notes="", attempt_date=None):
+def update_attempt(attempt_id, route_id, success, notes="", attempt_date=None):
     # convertir datetime.date en string "YYYY-MM-DD" si nécessaire
     if attempt_date is None:
         date_str = None  # ou mettre datetime.now().strftime("%Y-%m-%d")

@@ -1,6 +1,6 @@
 import streamlit as st
 from utils.routes import get_routes
-from utils.attempts import get_attempts, add_attempt, edit_attempt, delete_attempt
+from utils.attempts import get_attempts, add_attempt, update_attempt, delete_attempt
 from datetime import date, datetime
 from utils.constants import ROUTE_COLORS
 
@@ -104,7 +104,7 @@ def display_attempt_form_edit(attempt):
                 for err in errors:
                     st.error(err)
             else:
-                edit_attempt(attempt.get("id"), route_id, success, notes, attempt_date)
+                update_attempt(attempt.get("id"), route_id, success, notes, attempt_date)
                 st.success("Tentative modifiée !")
                 st.rerun()
 
@@ -145,7 +145,6 @@ if attempts:
 
         col_data, col_edit, col_del = st.columns([8, 1, 1])
         with col_data:
-            # --- affichage ---
             st.markdown(
                 f"{date_str} — {route_color} **{route_grade} {route_name}** — {status}{notes_display}"
             )

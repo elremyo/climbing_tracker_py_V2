@@ -1,8 +1,20 @@
 import streamlit as st
 from utils.routes import get_routes
-from utils.attempts import get_attempts, add_attempt
+from utils.attempts import get_attempts, add_attempt, edit_attempt, delete_attempt
 from datetime import date, datetime
 from utils.constants import ROUTE_COLORS
+
+st.markdown("""
+            <style>
+                div[data-testid="stColumn"] {
+                    width: fit-content !important;
+                    flex: unset;
+                }
+                div[data-testid="stColumn"] * {
+                    width: fit-content !important;
+                }
+            </style>
+            """, unsafe_allow_html=True)
 
 
 st.title("🎯 Mes tentatives")
@@ -16,7 +28,7 @@ if "show_attempt_success" not in st.session_state:
 routes = get_routes()
 
 # --- Bouton pour afficher le formulaire ---
-if st.button("➕ Ajouter une tentative"):
+if st.button("➕ Ajouter une tentative", key="add_attempt_button"):
     st.session_state.show_attempt_form = True
 
 # --- Formulaire d'ajout ---
@@ -60,6 +72,44 @@ if st.session_state.show_attempt_success:
     st.session_state.show_attempt_success = False
 
 
+
+@st.dialog("Éditer la tentative ")
+def display_attempt_form_edit(attempt):
+    with st.form("edit_attempt_form"):
+        # Sélecteur de voie
+        route_mapping = {f"{r['name']} ({r['grade']})": r["id"] for r in routes}
+        selected_route = next((k for k, v in route_mapping.items() if v == attempt['route_id']), "")
+        selected_route = st.selectbox("Voie", [""] + list(route_mapping.keys()), index=list(route_mapping.keys()).index(selected_route) + 1)
+        route_id = route_mapping.get(selected_route, None)
+
+        # Date picker
+        try:
+            date_obj = datetime.fromisoformat(attempt["date"])
+            default_date = date_obj.date()
+        except:
+            default_date = date.today()
+        attempt_date = st.date_input("Date", value=default_date)
+
+        success = st.checkbox("Réussie", value=attempt.get("success", False))
+        notes = st.text_area("Notes", value=attempt.get("notes", ""))
+
+        submitted = st.form_submit_button("Enregistrer")
+        if submitted:
+            # --- Contrôles de saisie ---
+            errors = []
+            if not selected_route or selected_route == "" or not attempt_date:
+                errors.append("Sélectionne une voie.")
+
+            if errors:
+                for err in errors:
+                    st.error(err)
+            else:
+                edit_attempt(attempt.get("id"), route_id, success, notes, attempt_date)
+                st.success("Tentative modifiée !")
+                st.rerun()
+
+
+
 # --- Historique des tentatives ---
 attempts = get_attempts()
 if attempts:
@@ -93,10 +143,20 @@ if attempts:
         else:
             notes_display = ""
 
-        # --- affichage ---
-        st.markdown(
-            f"{date_str} — {route_color} **{route_grade} {route_name}** — {status}{notes_display}"
-        )
-
+        col_data, col_edit, col_del = st.columns([8, 1, 1])
+        with col_data:
+            # --- affichage ---
+            st.markdown(
+                f"{date_str} — {route_color} **{route_grade} {route_name}** — {status}{notes_display}"
+            )
+        with col_edit:
+            btn_key = f"attempt_{a.get('id')}"
+            if st.button("", key=btn_key+"_edit", icon="✏️"):
+                display_attempt_form_edit(a)
+        with col_del:
+            if st.button("", key=btn_key+"_del", icon="🗑️"):
+                delete_attempt(a.get("id"))
+                st.success("Tentative supprimée.")
+                st.rerun()
 else:
     st.info("Aucune tentative enregistrée.")

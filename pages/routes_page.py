@@ -1,6 +1,8 @@
 import streamlit as st
 from utils.routes import get_routes, add_route, update_route, delete_route
 from utils.constants import ROUTE_COLORS, GRADES
+import pandas as pd
+
 
 routes = get_routes()
 
@@ -99,6 +101,33 @@ def display_route_form_edit(route):
                 st.rerun()
 
 # --- Liste des voies ---
+
+
+
+# -------- Affichage tableau éditable --------
+df  = pd.DataFrame(
+    {"name": [r["name"] for r in routes],
+    "grade": [r["grade"] for r in routes],
+    "color": [ROUTE_COLORS.get(r["color"], "❓") for r in routes],
+    "archived": [True if r.get("archived", False) else False for r in routes]
+    }
+)
+
+st.data_editor(
+    df,
+    column_config={
+        "name": "Nom",
+        "grade": "Cotation",
+        "color": "Couleur",
+        "archived": "Archivée"
+    },
+    hide_index=True,
+    use_container_width=True)
+
+st.divider()
+#--------------------------------------------
+
+
 if routes:
     for route in routes:
         color_emoji = ROUTE_COLORS.get(route["color"], "❓")

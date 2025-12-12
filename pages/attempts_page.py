@@ -1,7 +1,7 @@
 import streamlit as st
 from utils.routes import get_routes
 from utils.attempts import get_attempts, add_attempt, update_attempt, delete_attempt
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from utils.constants import ROUTE_COLORS
 from utils.formatting import format_date_fr
 
@@ -21,20 +21,157 @@ st.markdown("""
 attempts = get_attempts()
 routes = get_routes()
 
-st.subheader(f"🎯 Mes tentatives ({len(attempts)})")
-
 # Initialisation des flags session_state
 if "show_attempt_form" not in st.session_state:
     st.session_state.show_attempt_form = False
 if "show_attempt_success" not in st.session_state:
     st.session_state.show_attempt_success = False
 
+# Initialisation des filtres dans session_state
+if "filter_period" not in st.session_state:
+    st.session_state.filter_period = "Tout"
+if "filter_status" not in st.session_state:
+    st.session_state.filter_status = "Toutes"
+if "filter_routes" not in st.session_state:
+    st.session_state.filter_routes = []
+if "sort_order" not in st.session_state:
+    st.session_state.sort_order = "Plus récent"
 
-# --- Bouton pour afficher le formulaire ---
-if st.button("➕ Ajouter une tentative", key="add_attempt_button"):
+
+# --- FONCTION DE FILTRAGE ---
+def filter_attempts(attempts, routes):
+    """Applique les filtres aux tentatives"""
+    filtered = attempts.copy()
+    
+    # Filtre par période
+    if st.session_state.filter_period != "Tout":
+        today = date.today()
+        
+        if st.session_state.filter_period == "Aujourd'hui":
+            date_limit = today
+            filtered = [a for a in filtered if datetime.fromisoformat(a["date"]).date() == date_limit]
+        
+        elif st.session_state.filter_period == "Cette semaine":
+            # Lundi de cette semaine
+            date_limit = today - timedelta(days=today.weekday())
+            filtered = [a for a in filtered if datetime.fromisoformat(a["date"]).date() >= date_limit]
+        
+        elif st.session_state.filter_period == "Ce mois-ci":
+            filtered = [a for a in filtered 
+                       if datetime.fromisoformat(a["date"]).date().month == today.month 
+                       and datetime.fromisoformat(a["date"]).date().year == today.year]
+    
+    # Filtre par statut
+    if st.session_state.filter_status == "Réussies":
+        filtered = [a for a in filtered if a.get("success")]
+    elif st.session_state.filter_status == "Échouées":
+        filtered = [a for a in filtered if not a.get("success")]
+    
+    # Filtre par voies
+    if st.session_state.filter_routes:
+        filtered = [a for a in filtered if a["route_id"] in st.session_state.filter_routes]
+    
+    # Tri
+    if st.session_state.sort_order == "Plus récent":
+        filtered = sorted(filtered, key=lambda a: a["date"], reverse=True)
+    else:
+        filtered = sorted(filtered, key=lambda a: a["date"], reverse=False)
+    
+    return filtered
+
+
+# --- HEADER AVEC COMPTEUR ---
+filtered_attempts = filter_attempts(attempts, routes)
+st.subheader(f"🎯 Mes tentatives ({len(filtered_attempts)}/{len(attempts)})")
+
+# --- BOUTON AJOUTER (GROS POUR MOBILE) ---
+if st.button("➕ Ajouter une tentative", key="add_attempt_button", use_container_width=True):
     st.session_state.show_attempt_form = True
 
-# --- Formulaire d'ajout ---
+# --- FILTRES RAPIDES (PILLS HORIZONTALES) ---
+st.markdown("**Période**")
+col1, col2, col3, col4 = st.columns(4)
+with col1:
+    if st.button("Aujourd'hui", key="filter_today", 
+                 type="primary" if st.session_state.filter_period == "Aujourd'hui" else "secondary",
+                 use_container_width=True):
+        st.session_state.filter_period = "Aujourd'hui"
+        st.rerun()
+with col2:
+    if st.button("Semaine", key="filter_week",
+                 type="primary" if st.session_state.filter_period == "Cette semaine" else "secondary",
+                 use_container_width=True):
+        st.session_state.filter_period = "Cette semaine"
+        st.rerun()
+with col3:
+    if st.button("Mois", key="filter_month",
+                 type="primary" if st.session_state.filter_period == "Ce mois-ci" else "secondary",
+                 use_container_width=True):
+        st.session_state.filter_period = "Ce mois-ci"
+        st.rerun()
+with col4:
+    if st.button("Tout", key="filter_all",
+                 type="primary" if st.session_state.filter_period == "Tout" else "secondary",
+                 use_container_width=True):
+        st.session_state.filter_period = "Tout"
+        st.rerun()
+
+st.markdown("**Statut**")
+col1, col2, col3 = st.columns(3)
+with col1:
+    if st.button("Toutes", key="status_all",
+                 type="primary" if st.session_state.filter_status == "Toutes" else "secondary",
+                 use_container_width=True):
+        st.session_state.filter_status = "Toutes"
+        st.rerun()
+with col2:
+    if st.button("✅ Réussies", key="status_success",
+                 type="primary" if st.session_state.filter_status == "Réussies" else "secondary",
+                 use_container_width=True):
+        st.session_state.filter_status = "Réussies"
+        st.rerun()
+with col3:
+    if st.button("❌ Échouées", key="status_failed",
+                 type="primary" if st.session_state.filter_status == "Échouées" else "secondary",
+                 use_container_width=True):
+        st.session_state.filter_status = "Échouées"
+        st.rerun()
+
+# --- FILTRES AVANCÉS (COLLAPSIBLE) ---
+with st.expander("🔍 Filtres avancés"):
+    # Filtre par voies
+    if routes:
+        route_options = {f"{r['name']} ({r['grade']})": r["id"] for r in routes}
+        selected_routes = st.multiselect(
+            "Filtrer par voies",
+            options=list(route_options.keys()),
+            default=[k for k, v in route_options.items() if v in st.session_state.filter_routes],
+            placeholder="Sélectionne une ou plusieurs voies"
+        )
+        st.session_state.filter_routes = [route_options[r] for r in selected_routes]
+    
+    # Tri
+    sort_option = st.radio(
+        "Trier par",
+        ["Plus récent", "Plus ancien"],
+        index=0 if st.session_state.sort_order == "Plus récent" else 1,
+        horizontal=True
+    )
+    if sort_option != st.session_state.sort_order:
+        st.session_state.sort_order = sort_option
+        st.rerun()
+    
+    # Bouton reset
+    if st.button("🔄 Réinitialiser les filtres", use_container_width=True):
+        st.session_state.filter_period = "Tout"
+        st.session_state.filter_status = "Toutes"
+        st.session_state.filter_routes = []
+        st.session_state.sort_order = "Plus récent"
+        st.rerun()
+
+st.divider()
+
+# --- FORMULAIRE D'AJOUT ---
 if st.session_state.show_attempt_form:
     if not routes:
         st.warning("Ajoute d'abord une voie avant d'enregistrer une tentative.")
@@ -51,13 +188,22 @@ if st.session_state.show_attempt_form:
             success = st.checkbox("Réussie")
             notes = st.text_area("Notes")
 
-            submitted = st.form_submit_button("Enregistrer")
+            col1, col2 = st.columns(2)
+            with col1:
+                submitted = st.form_submit_button("✅ Enregistrer", use_container_width=True)
+            with col2:
+                cancel = st.form_submit_button("❌ Annuler", use_container_width=True)
+            
+            if cancel:
+                st.session_state.show_attempt_form = False
+                st.rerun()
+            
             if submitted:
                 # --- Contrôles de saisie ---
                 errors = []
                 if not selected_route or selected_route == "":
                     errors.append("Sélectionne une voie.")
-                elif route_id is None:  # ✅ Vérification supplémentaire
+                elif route_id is None:
                     errors.append("Erreur : voie invalide sélectionnée.")
                 
                 if not attempt_date:
@@ -67,7 +213,6 @@ if st.session_state.show_attempt_form:
                     for err in errors:
                         st.error(err)
                 else:
-                    # ✅ Ici on est sûr que route_id est valide
                     add_attempt(route_id, success, notes, attempt_date)
                     st.session_state.show_attempt_success = True
                     st.session_state.show_attempt_form = False
@@ -75,19 +220,17 @@ if st.session_state.show_attempt_form:
 
 # --- Message de succès ---
 if st.session_state.show_attempt_success:
-    st.success("Tentative enregistrée !")
+    st.toast("✅ Tentative enregistrée !", icon="✅")
     st.session_state.show_attempt_success = False
 
 
-
-@st.dialog("Éditer la tentative ")
+@st.dialog("Éditer la tentative")
 def display_attempt_form_edit(attempt):
     with st.form("edit_attempt_form"):
         # Sélecteur de voie
         route_mapping = {f"{r['name']} ({r['grade']})": r["id"] for r in routes}
         selected_route = next((k for k, v in route_mapping.items() if v == attempt['route_id']), "")
         
-        # ✅ Gestion du cas où la voie a été supprimée
         if not selected_route:
             st.warning("⚠️ La voie associée à cette tentative a été supprimée. Sélectionne une nouvelle voie.")
             selected_route = st.selectbox("Voie", [""] + list(route_mapping.keys()))
@@ -114,7 +257,7 @@ def display_attempt_form_edit(attempt):
             errors = []
             if not selected_route or selected_route == "":
                 errors.append("Sélectionne une voie.")
-            elif route_id is None:  # ✅ Vérification supplémentaire
+            elif route_id is None:
                 errors.append("Erreur : voie invalide sélectionnée.")
             
             if not attempt_date:
@@ -124,17 +267,14 @@ def display_attempt_form_edit(attempt):
                 for err in errors:
                     st.error(err)
             else:
-                # ✅ Ici on est sûr que route_id est valide
                 update_attempt(attempt.get("id"), route_id, success, notes, attempt_date)
-                st.success("Tentative modifiée !")
+                st.toast("✅ Tentative modifiée !", icon="✅")
                 st.rerun()
 
 
-
-# --- Historique des tentatives ---
-if attempts:
-    for a in attempts:
-
+# --- HISTORIQUE DES TENTATIVES (RÉSULTATS FILTRÉS) ---
+if filtered_attempts:
+    for a in filtered_attempts:
         # --- Récup infos de la voie ---
         route = next((r for r in routes if r['id'] == a['route_id']), None)
         if route:
@@ -142,7 +282,6 @@ if attempts:
             route_color = ROUTE_COLORS.get(route["color"], "❓")
             route_grade = route["grade"]
         else:
-            # ✅ Gestion du cas où la voie a été supprimée
             route_name = "Voie supprimée"
             route_color = "❓"
             route_grade = ""
@@ -172,7 +311,10 @@ if attempts:
         with col_del:
             if st.button("", key=btn_key+"_del", icon="🗑️"):
                 delete_attempt(a.get("id"))
-                st.success("Tentative supprimée.")
+                st.toast("✅ Tentative supprimée !", icon="✅")
                 st.rerun()
 else:
-    st.info("Aucune tentative enregistrée.")
+    if attempts:
+        st.info("Aucune tentative ne correspond aux filtres sélectionnés.")
+    else:
+        st.info("Aucune tentative enregistrée.")

@@ -10,8 +10,7 @@ class FilterComponents:
     @staticmethod
     def period_pills():
         """Pills de sélection de période"""
-        st.markdown("**Période**")
-        
+
         period_options = ["Aujourd'hui", "Semaine", "Mois", "Tout"]
         
         # Mapping session_state → label
@@ -24,12 +23,11 @@ class FilterComponents:
         current_period = current_map.get(st.session_state.filter_period, "Tout")
         
         selected = st.pills(
-            "filter_period_pills",
+            "Période",
             options=period_options,
             selection_mode="single",
-            default=current_period,
-            label_visibility="collapsed"
-        )
+            default=current_period
+            )
         
         # Mapping label → session_state
         reverse_map = {
@@ -47,7 +45,6 @@ class FilterComponents:
     @staticmethod
     def status_pills():
         """Pills de sélection de statut"""
-        st.markdown("**Statut**")
         
         status_options = ["Toutes", "✅ Réussies", "❌ Échouées"]
         
@@ -60,11 +57,10 @@ class FilterComponents:
         current_status = current_map[st.session_state.filter_status]
         
         selected = st.pills(
-            "filter_status_pills",
+            "Statut",
             options=status_options,
             selection_mode="single",
-            default=current_status,
-            label_visibility="collapsed"
+            default=current_status
         )
         
         # Mapping label → session_state

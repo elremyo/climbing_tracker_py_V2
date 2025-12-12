@@ -15,14 +15,14 @@ routes = get_routes()
 filtered_routes = FilterService.filter_routes(routes)
 
 # Header
-st.subheader(f"🧗 Mes voies ({len(filtered_routes)}/{len(routes)})")
+st.subheader(f"Mes voies ({len(filtered_routes)}/{len(routes)})")
 
 # Bouton ajouter
-if st.button("➕ Ajouter une voie", use_container_width=True):
+if st.button("Ajouter une voie", icon=":material/add:", use_container_width=True,type="primary"):
     st.session_state.show_form = True
 
 # Filtres
-with st.expander("🔍 Filtres"):
+with st.expander("Filtres"):
     FilterComponents.colors_multiselect()
     FilterComponents.grades_multiselect()
     
@@ -34,7 +34,7 @@ with st.expander("🔍 Filtres"):
         st.session_state.show_archived = show_archived
         st.rerun()
     
-    if st.button("🔄 Réinitialiser les filtres", use_container_width=True):
+    if st.button("Réinitialiser les filtres",icon=":material/replay:", use_container_width=True):
         SessionStateService.reset_routes_filters()
         st.rerun()
 

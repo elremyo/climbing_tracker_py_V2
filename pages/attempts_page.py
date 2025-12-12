@@ -29,10 +29,10 @@ routes = get_routes()
 filtered_attempts = FilterService.filter_attempts(attempts, routes)
 
 # Header
-st.subheader(f"🎯 Mes tentatives ({len(filtered_attempts)}/{len(attempts)})")
+st.subheader(f"Mes tentatives ({len(filtered_attempts)}/{len(attempts)})")
 
 # Bouton ajouter
-if st.button("➕ Ajouter une tentative", key="add_attempt_button", use_container_width=True):
+if st.button("Ajouter une tentative", key="add_attempt_button",  icon=":material/add:", use_container_width=True,type="primary"):
     st.session_state.show_attempt_form = True
 
 # Filtres rapides
@@ -40,7 +40,7 @@ FilterComponents.period_pills()
 FilterComponents.status_pills()
 
 # Filtres avancés
-with st.expander("🔍 Filtres avancés"):
+with st.expander("Filtres avancés"):
     FilterComponents.routes_multiselect(routes)
     
     sort_option = st.radio(
@@ -53,7 +53,7 @@ with st.expander("🔍 Filtres avancés"):
         st.session_state.sort_order = sort_option
         st.rerun()
     
-    if st.button("🔄 Réinitialiser les filtres", use_container_width=True):
+    if st.button("Réinitialiser les filtres", icon=":material/replay:",use_container_width=True):
         SessionStateService.reset_attempts_filters()
         st.rerun()
 

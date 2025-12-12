@@ -24,7 +24,7 @@ class RouteCard:
         
         display = f"{color_emoji} **{route['grade']}** — {route['name']}"
         if archived:
-            display += " — 🔒 _Archivée_"
+            display += " — :material/lock: _Archivée_"
         
         if archived:
             # Pour les voies archivées : bouton réactiver
@@ -39,20 +39,20 @@ class RouteCard:
         with col_edit:
             if on_edit:
                 btn_key = f"route_{route.get('id')}_edit"
-                if st.button("", key=btn_key, icon="✏️"):
+                if st.button("", key=btn_key, icon=":material/edit:", help="Éditer",type="tertiary"):
                     on_edit()
         
         if archived:
             with col_unarchive:
                 if on_unarchive:
                     btn_key = f"route_{route.get('id')}_unarchive"
-                    if st.button("", key=btn_key, icon="♻️", help="Réactiver"):
+                    if st.button("", key=btn_key, icon=":material/lock_reset:", help="Réactiver",type="tertiary"):
                         on_unarchive()
         else:
             with col_archive:
                 if on_archive:
                     btn_key = f"route_{route.get('id')}_archive"
-                    if st.button("", key=btn_key, icon="🗑️", help="Archiver"):
+                    if st.button("", key=btn_key, icon=":material/archive:", help="Archiver",type="tertiary"):
                         on_archive()
 
 
@@ -100,11 +100,11 @@ class AttemptCard:
         with col_edit:
             if on_edit:
                 btn_key = f"attempt_{attempt.get('id')}_edit"
-                if st.button("", key=btn_key, icon="✏️"):
+                if st.button("", key=btn_key, icon=":material/edit:", help="Éditer",type="tertiary"):
                     on_edit()
         
         with col_del:
             if on_delete:
                 btn_key = f"attempt_{attempt.get('id')}_del"
-                if st.button("", key=btn_key, icon="🗑️"):
+                if st.button("", key=btn_key, icon=":material/delete:", help="Supprimer",type="tertiary"):
                     on_delete()

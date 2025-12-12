@@ -3,7 +3,7 @@ from data import get_routes, get_attempts
 from services.stats_service import StatsService
 from utils.formatting import format_date_fr
 
-st.subheader("📊 Tableau de bord")
+st.subheader("Tableau de bord")
 
 routes = get_routes()
 attempts = get_attempts()

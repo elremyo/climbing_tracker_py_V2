@@ -45,16 +45,13 @@ def confirm_delete_dialog(item_name, on_confirm):
         item_name: nom de l'élément à supprimer
         on_confirm: callback() appelé si l'utilisateur confirme
     """
-    st.warning(f"⚠️ Es-tu sûr de vouloir supprimer **{item_name}** ?")
+    st.warning(f"Es-tu sûr de vouloir supprimer **{item_name}** ?")
     st.markdown("Cette action est **irréversible**.")
+
+    if st.button("Supprimer", use_container_width=True, type="primary"):
+        on_confirm()
+        st.rerun()
+
+    if st.button("Annuler", use_container_width=True, type="secondary"):
+        st.rerun()
     
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        if st.button("❌ Annuler", use_container_width=True, type="secondary"):
-            st.rerun()
-    
-    with col2:
-        if st.button("✅ Confirmer", use_container_width=True, type="primary"):
-            on_confirm()
-            st.rerun()

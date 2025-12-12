@@ -36,11 +36,8 @@ class RouteForm:
                 format_func=lambda c: f"{ROUTE_COLORS[c]} {c}"
             )
             
-            col1, col2 = st.columns(2)
-            with col1:
-                submitted = st.form_submit_button("✅ Enregistrer", use_container_width=True)
-            with col2:
-                cancel = st.form_submit_button("❌ Annuler", use_container_width=True)
+            submitted = st.form_submit_button("Enregistrer", use_container_width=True,type="primary")
+            cancel = st.form_submit_button("Annuler", use_container_width=True, type="secondary")
             
             if cancel and on_cancel:
                 on_cancel()
@@ -114,11 +111,8 @@ class AttemptForm:
             success = st.checkbox("Réussie", value=attempt.get("success", False) if attempt else False)
             notes = st.text_area("Notes", value=attempt.get("notes", "") if attempt else "")
             
-            col1, col2 = st.columns(2)
-            with col1:
-                submitted = st.form_submit_button("✅ Enregistrer", use_container_width=True)
-            with col2:
-                cancel = st.form_submit_button("❌ Annuler", use_container_width=True)
+            submitted = st.form_submit_button("Enregistrer", use_container_width=True, type="primary")
+            cancel = st.form_submit_button("Annuler", use_container_width=True, type="secondary")
             
             if cancel and on_cancel:
                 on_cancel()

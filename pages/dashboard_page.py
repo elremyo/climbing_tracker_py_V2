@@ -2,7 +2,7 @@ import streamlit as st
 from utils.routes import get_routes
 from utils.attempts import get_attempts
 from utils.constants import ROUTE_COLORS, GRADES
-from datetime import datetime
+from utils.formatting import format_date_fr
 
 st.subheader("📊 Tableau de bord")
 
@@ -24,12 +24,7 @@ st.metric("✅ Taux de réussite global", f"{success_rate:.1f} %", border=True)
 
 # Tentative la plus récente
 most_recent_attempt = max(attempts, key=lambda a: a["date"])
-try:
-    attempt_date_obj = datetime.fromisoformat(most_recent_attempt["date"])
-    attempt_date_str = attempt_date_obj.strftime("%d/%m/%y")
-except:
-    attempt_date_str = most_recent_attempt["date"]
-
+attempt_date_str = format_date_fr(most_recent_attempt["date"])
 st.metric("📅 Dernière tentative", attempt_date_str, border=True)
 
 # Voie la plus tentée
@@ -51,12 +46,7 @@ if successful_attempts_sorted:
     hardest_attempt = successful_attempts_sorted[0]
     hardest_route = next((r for r in routes if r["id"] == hardest_attempt["route_id"]), None)
     if hardest_route:
-        try:
-            date_obj = datetime.fromisoformat(hardest_attempt["date"])
-            date_str = date_obj.strftime("%d/%m/%y")
-        except:
-            date_str = hardest_attempt["date"]  # fallback si format inattendu
-        
+        date_str = format_date_fr(hardest_attempt["date"])
         st.metric("🏆Meilleure difficulté", f"{hardest_route['grade']} ({hardest_route['name']})", border=True)
 
 # Affichage des statistiques par niveau de difficulté
@@ -74,4 +64,3 @@ if grade_stats:
         st.markdown(f"**{grade}** : Réussi {successful} sur {total} -- {rate:.1f} %")
 else:
     st.info("Aucune donnée par niveau de difficulté pour le moment.")
-

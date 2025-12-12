@@ -57,6 +57,9 @@ if st.session_state.show_attempt_form:
                 errors = []
                 if not selected_route or selected_route == "":
                     errors.append("Sélectionne une voie.")
+                elif route_id is None:  # ✅ Vérification supplémentaire
+                    errors.append("Erreur : voie invalide sélectionnée.")
+                
                 if not attempt_date:
                     errors.append("Sélectionne une date.")
 
@@ -64,6 +67,7 @@ if st.session_state.show_attempt_form:
                     for err in errors:
                         st.error(err)
                 else:
+                    # ✅ Ici on est sûr que route_id est valide
                     add_attempt(route_id, success, notes, attempt_date)
                     st.session_state.show_attempt_success = True
                     st.session_state.show_attempt_form = False
@@ -82,7 +86,15 @@ def display_attempt_form_edit(attempt):
         # Sélecteur de voie
         route_mapping = {f"{r['name']} ({r['grade']})": r["id"] for r in routes}
         selected_route = next((k for k, v in route_mapping.items() if v == attempt['route_id']), "")
-        selected_route = st.selectbox("Voie", [""] + list(route_mapping.keys()), index=list(route_mapping.keys()).index(selected_route) + 1)
+        
+        # ✅ Gestion du cas où la voie a été supprimée
+        if not selected_route:
+            st.warning("⚠️ La voie associée à cette tentative a été supprimée. Sélectionne une nouvelle voie.")
+            selected_route = st.selectbox("Voie", [""] + list(route_mapping.keys()))
+        else:
+            selected_route = st.selectbox("Voie", [""] + list(route_mapping.keys()), 
+                                        index=list(route_mapping.keys()).index(selected_route) + 1)
+        
         route_id = route_mapping.get(selected_route, None)
 
         # Date picker
@@ -100,13 +112,19 @@ def display_attempt_form_edit(attempt):
         if submitted:
             # --- Contrôles de saisie ---
             errors = []
-            if not selected_route or selected_route == "" or not attempt_date:
+            if not selected_route or selected_route == "":
                 errors.append("Sélectionne une voie.")
+            elif route_id is None:  # ✅ Vérification supplémentaire
+                errors.append("Erreur : voie invalide sélectionnée.")
+            
+            if not attempt_date:
+                errors.append("Sélectionne une date.")
 
             if errors:
                 for err in errors:
                     st.error(err)
             else:
+                # ✅ Ici on est sûr que route_id est valide
                 update_attempt(attempt.get("id"), route_id, success, notes, attempt_date)
                 st.success("Tentative modifiée !")
                 st.rerun()
@@ -124,6 +142,7 @@ if attempts:
             route_color = ROUTE_COLORS.get(route["color"], "❓")
             route_grade = route["grade"]
         else:
+            # ✅ Gestion du cas où la voie a été supprimée
             route_name = "Voie supprimée"
             route_color = "❓"
             route_grade = ""

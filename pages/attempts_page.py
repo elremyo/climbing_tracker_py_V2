@@ -3,6 +3,7 @@ from utils.routes import get_routes
 from utils.attempts import get_attempts, add_attempt, update_attempt, delete_attempt
 from datetime import date, datetime
 from utils.constants import ROUTE_COLORS
+from utils.formatting import format_date_fr
 
 st.markdown("""
             <style>
@@ -36,7 +37,7 @@ if st.button("➕ Ajouter une tentative", key="add_attempt_button"):
 # --- Formulaire d'ajout ---
 if st.session_state.show_attempt_form:
     if not routes:
-        st.warning("Ajoute d’abord une voie avant d’enregistrer une tentative.")
+        st.warning("Ajoute d'abord une voie avant d'enregistrer une tentative.")
     else:
         with st.form("add_attempt_form"):
             # Sélecteur de voie vide par défaut
@@ -128,11 +129,7 @@ if attempts:
             route_grade = ""
 
         # --- Format date JJ/MM/AA ---
-        try:
-            date_obj = datetime.fromisoformat(a["date"])
-            date_str = date_obj.strftime("%d/%m/%y")
-        except:
-            date_str = a["date"]  # fallback si format inattendu
+        date_str = format_date_fr(a["date"])
 
         # --- Status ---
         status = "✅ Réussie" if a.get("success") else "❌ Échouée"

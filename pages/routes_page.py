@@ -47,12 +47,12 @@ filtered_routes = filter_routes(routes)
 
 st.subheader(f"🧗 Mes voies ({len(filtered_routes)}/{len(routes)})")
 
-# --- BOUTON AJOUTER (GROS POUR MOBILE) ---
-if st.button("➕ Ajouter une voie", use_container_width=True):
+# --- BOUTON AJOUTER ---
+if st.button("Ajouter une voie",icon=":material/add:", key="add_attempt_button", use_container_width=True,type="primary"):
     st.session_state.show_form = True
 
 # --- FILTRES ---
-with st.expander("🔍 Filtres"):
+with st.expander("Filtres"):
     # Filtre par couleurs
     selected_colors = st.multiselect(
         "Filtrer par couleurs",
@@ -82,7 +82,7 @@ with st.expander("🔍 Filtres"):
         st.rerun()
     
     # Bouton reset
-    if st.button("🔄 Réinitialiser les filtres", use_container_width=True):
+    if st.button(":material/restart_alt: Réinitialiser les filtres", use_container_width=True):
         st.session_state.filter_colors = []
         st.session_state.filter_grades = []
         st.session_state.show_archived = True
@@ -110,9 +110,11 @@ if st.session_state.show_form:
 
         col1, col2 = st.columns(2)
         with col1:
-            submitted = st.form_submit_button("✅ Enregistrer", use_container_width=True)
+            submitted = st.form_submit_button("Enregistrer",
+                                              use_container_width=True,
+                                              type="primary")
         with col2:
-            cancel = st.form_submit_button("❌ Annuler", use_container_width=True)
+            cancel = st.form_submit_button("Annuler", use_container_width=True)
         
         if cancel:
             st.session_state.show_form = False
@@ -157,7 +159,9 @@ def display_route_form_edit(route):
             format_func=lambda c: f"{ROUTE_COLORS[c]} {c}"
         )
 
-        submitted = st.form_submit_button("Enregistrer")
+        submitted = st.form_submit_button("Enregistrer",
+                                          use_container_width=True,
+                                          type="primary")
         if submitted:
             errors = []
 
@@ -176,29 +180,49 @@ def display_route_form_edit(route):
                 st.session_state.show_edit_success = True
                 st.rerun()
 
+@st.dialog("Supprimer la voie")
+def display_route_form_delete(route):
+    with st.form("delete_route_form"):
+        st.markdown("Es-tu sûr de vouloir supprimer cette voie ? Cette action est irréversible.")
+        delete_submitted = st.form_submit_button("Supprimer",
+                                              use_container_width=True,
+                                              type="primary"
+                                              )
+        cancel = st.form_submit_button("Annuler", use_container_width=True)
+        if delete_submitted:
+            delete_route(route.get("id"))
+            st.toast("✅ Voie supprimée !", icon="✅")
+            st.rerun()
+        elif cancel:
+            st.rerun()
+
+
 # --- LISTE DES VOIES (RÉSULTATS FILTRÉS) ---
 if filtered_routes:
     for route in filtered_routes:
-        color_emoji = ROUTE_COLORS.get(route["color"], "❓")
-        archived = route.get("archived", False)
-        # Ligne d'affichage (emoji + couleur + cotation + nom)
-        display = f"{color_emoji} **{route['grade']}** — {route['name']}"
-        # Tag "archivée"
-        if archived:
-            display += " — 🔒 _Archivée_"
-        col_data, col_edit, col_del = st.columns([8, 1, 1])
-        with col_data:
-            st.markdown(display)
-        with col_edit:
-            btn_key = f"route_{route.get('id')}"
-            if st.button("", key=btn_key+"_edit", icon="✏️"):
-                # Afficher le formulaire d'édition
-                display_route_form_edit(route)
-        with col_del:
-            if st.button("", key=btn_key+"_del", icon="🗑️"):
-                delete_route(route.get("id"))
-                st.session_state.show_delete_success = True
-                st.rerun()
+        with st.container(border=False,
+                  vertical_alignment="center",
+                  gap=None
+                  ):
+            color_emoji = ROUTE_COLORS.get(route["color"], "❓")
+            archived = route.get("archived", False)
+            # Ligne d'affichage (emoji + couleur + cotation + nom)
+            display = f"{color_emoji} **{route['grade']}** — {route['name']}"
+            # Tag "archivée"
+            if archived:
+                display += " — :material/lock: _Archivée_"
+            col_data, col_edit, col_del = st.columns([8, 1, 1])
+            with col_data:
+                st.markdown(display)
+            with col_edit:
+                btn_key = f"route_{route.get('id')}"
+                if st.button("", key=btn_key+"_edit", icon=":material/edit:", type="tertiary"):
+                    # Afficher le formulaire d'édition
+                    display_route_form_edit(route)
+            with col_del:
+                if st.button("", key=btn_key+"_del", icon=":material/delete:", type="tertiary"):
+                    display_route_form_delete(route)
+
 
 else:
     if routes:

@@ -8,19 +8,18 @@ def get_attempts():
         supabase
         .table("attempts")
         .select("*")
-        .order("date", desc=True)
+        .order("created_at", desc=True)
         .execute()
     )
-    # res.data est une liste de dict
     return res.data if res.data else []
 
 
 def add_attempt(route_id, success, notes="", attempt_date=None):
     # convertir datetime.date en string "YYYY-MM-DD" si nécessaire
     if attempt_date is None:
-        date_str = None  # ou mettre datetime.now().strftime("%Y-%m-%d")
+        date_str = None  
     elif hasattr(attempt_date, "isoformat"):
-        date_str = attempt_date.isoformat()  # date -> "YYYY-MM-DD"
+        date_str = attempt_date.isoformat() 
     else:
         date_str = str(attempt_date)
 
@@ -37,9 +36,9 @@ def add_attempt(route_id, success, notes="", attempt_date=None):
 def update_attempt(attempt_id, route_id, success, notes="", attempt_date=None):
     # convertir datetime.date en string "YYYY-MM-DD" si nécessaire
     if attempt_date is None:
-        date_str = None  # ou mettre datetime.now().strftime("%Y-%m-%d")
+        date_str = None 
     elif hasattr(attempt_date, "isoformat"):
-        date_str = attempt_date.isoformat()  # date -> "YYYY-MM-DD"
+        date_str = attempt_date.isoformat() 
     else:
         date_str = str(attempt_date)
 

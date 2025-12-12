@@ -222,8 +222,6 @@ if filtered_routes:
             with col_del:
                 if st.button("", key=btn_key+"_del", icon=":material/delete:", type="tertiary"):
                     display_route_form_delete(route)
-
-
 else:
     if routes:
         st.info("Aucune voie ne correspond aux filtres sélectionnés.")

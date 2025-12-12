@@ -5,18 +5,6 @@ from datetime import date, datetime, timedelta
 from utils.constants import ROUTE_COLORS
 from utils.formatting import format_date_fr
 
-st.markdown("""
-            <style>
-                div[data-testid="stColumn"] {
-                    width: fit-content !important;
-                    flex: unset;
-                }
-                div[data-testid="stColumn"] * {
-                    width: fit-content !important;
-                }
-            </style>
-            """, unsafe_allow_html=True)
-
 
 attempts = get_attempts()
 routes = get_routes()
@@ -85,11 +73,10 @@ filtered_attempts = filter_attempts(attempts, routes)
 st.subheader(f"🎯 Mes tentatives ({len(filtered_attempts)}/{len(attempts)})")
 
 # --- BOUTON AJOUTER ---
-if st.button("➕ Ajouter une tentative", key="add_attempt_button", use_container_width=True):
+if st.button("Ajouter une tentative",icon=":material/add:", key="add_attempt_button", use_container_width=True,type="primary"):
     st.session_state.show_attempt_form = True
 
 # --- FILTRES RAPIDES (PILLS) ---
-st.markdown("**Période**")
 
 # Mapping entre les index et les valeurs
 period_options = ["Semaine", "Mois", "Tout"]
@@ -103,12 +90,11 @@ else:  # "Tout"
     current_index = 2
 
 selected_period = st.pills(
-    "filter_period_pills",
+    "Période",
     options=period_options,
     selection_mode="single",
     default=period_options[current_index],
-    label_visibility="collapsed"
-)
+    )
 # Convertir la sélection en valeur session_state
 if selected_period == "Aujourd'hui":
     new_period = "Aujourd'hui"
@@ -124,8 +110,6 @@ if new_period != st.session_state.filter_period:
     st.rerun()
 
 
-
-st.markdown("**Statut**")
 status_options = ["Toutes", "✅ Réussies", "❌ Échouées"]
 # Trouver l'index actuel
 if st.session_state.filter_status == "Toutes":
@@ -136,12 +120,11 @@ else:
     status_index = 2
 
 selected_status = st.pills(
-    "filter_status_pills",
+    "Statut",
     options=status_options,
     selection_mode="single",
-    default=status_options[status_index],
-    label_visibility="collapsed"
-)
+    default=status_options[status_index]
+    )
 
 # Convertir en valeur session_state
 if selected_status == "Toutes":
@@ -156,7 +139,7 @@ if new_status != st.session_state.filter_status:
     st.rerun()
 
 # --- FILTRES AVANCÉS (COLLAPSIBLE) ---
-with st.expander("🔍 Filtres avancés"):
+with st.expander("Filtres avancés"):
     # Filtre par voies
     if routes:
         route_options = {f"{r['name']} ({r['grade']})": r["id"] for r in routes}
@@ -180,7 +163,7 @@ with st.expander("🔍 Filtres avancés"):
         st.rerun()
     
     # Bouton reset
-    if st.button("🔄 Réinitialiser les filtres", use_container_width=True):
+    if st.button(":material/restart_alt: Réinitialiser les filtres", use_container_width=True):
         st.session_state.filter_period = "Tout"
         st.session_state.filter_status = "Toutes"
         st.session_state.filter_routes = []
@@ -208,9 +191,9 @@ if st.session_state.show_attempt_form:
 
             col1, col2 = st.columns(2)
             with col1:
-                submitted = st.form_submit_button("✅ Enregistrer", use_container_width=True)
+                submitted = st.form_submit_button("Enregistrer", use_container_width=True, type="primary")
             with col2:
-                cancel = st.form_submit_button("❌ Annuler", use_container_width=True)
+                cancel = st.form_submit_button("Annuler", use_container_width=True)
             
             if cancel:
                 st.session_state.show_attempt_form = False
@@ -269,8 +252,11 @@ def display_attempt_form_edit(attempt):
         success = st.checkbox("Réussie", value=attempt.get("success", False))
         notes = st.text_area("Notes", value=attempt.get("notes", ""))
 
-        submitted = st.form_submit_button("Enregistrer")
-        if submitted:
+        edit_submitted = st.form_submit_button("Enregistrer",
+                                          use_container_width=True,
+                                          type="primary"
+                                          )
+        if edit_submitted:
             # --- Contrôles de saisie ---
             errors = []
             if not selected_route or selected_route == "":
@@ -289,48 +275,65 @@ def display_attempt_form_edit(attempt):
                 st.toast("✅ Tentative modifiée !", icon="✅")
                 st.rerun()
 
+@st.dialog("Supprimer la tentative")
+def display_attempt_form_delete(attempt):
+    with st.form("delete_attempt_form"):
+        st.markdown("Es-tu sûr de vouloir supprimer cette tentative ? Cette action est irréversible.")
+        delete_submitted = st.form_submit_button("Supprimer",
+                                              use_container_width=True,
+                                              type="primary"
+                                              )
+        cancel = st.form_submit_button("Annuler", use_container_width=True)
+        if delete_submitted:
+            delete_attempt(attempt.get("id"))
+            st.toast("✅ Tentative supprimée !", icon="✅")
+            st.rerun()
+        elif cancel:
+            st.rerun()
 
 # --- HISTORIQUE DES TENTATIVES (RÉSULTATS FILTRÉS) ---
 if filtered_attempts:
     for a in filtered_attempts:
-        # --- Récup infos de la voie ---
-        route = next((r for r in routes if r['id'] == a['route_id']), None)
-        if route:
-            route_name = route["name"]
-            route_color = ROUTE_COLORS.get(route["color"], "❓")
-            route_grade = route["grade"]
-        else:
-            route_name = "Voie supprimée"
-            route_color = "❓"
-            route_grade = ""
+        with st.container(border=False,
+                          vertical_alignment="center",
+                          gap=None
+                          ):
+            # --- Récup infos de la voie ---
+            route = next((r for r in routes if r['id'] == a['route_id']), None)
+            if route:
+                route_name = route["name"]
+                route_color = ROUTE_COLORS.get(route["color"], "❓")
+                route_grade = route["grade"]
+            else:
+                route_name = "Voie supprimée"
+                route_color = "❓"
+                route_grade = ""
 
-        # --- Format date JJ/MM/AA ---
-        date_str = format_date_fr(a["date"])
+            # --- Format date JJ/MM/AA ---
+            date_str = format_date_fr(a["date"])
 
-        # --- Status ---
-        status = "✅ Réussie" if a.get("success") else "❌ Échouée"
+            # --- Status ---
+            status = "✅ Réussie" if a.get("success") else "❌ Échouée"
 
-        # --- Notes : si vide → on n'affiche rien du tout ---
-        notes = a.get("notes")
-        if notes and notes.strip():
-            notes_display = f" — *{notes}*"
-        else:
-            notes_display = ""
+            # --- Notes : si vide → on n'affiche rien du tout ---
+            notes = a.get("notes")
+            if notes and notes.strip():
+                notes_display = f" — *{notes}*"
+            else:
+                notes_display = ""
 
-        col_data, col_edit, col_del = st.columns([8, 1, 1])
-        with col_data:
-            st.markdown(
-                f"{date_str} — {route_color} **{route_grade} {route_name}** — {status}{notes_display}"
-            )
-        with col_edit:
-            btn_key = f"attempt_{a.get('id')}"
-            if st.button("", key=btn_key+"_edit", icon="✏️"):
-                display_attempt_form_edit(a)
-        with col_del:
-            if st.button("", key=btn_key+"_del", icon="🗑️"):
-                delete_attempt(a.get("id"))
-                st.toast("✅ Tentative supprimée !", icon="✅")
-                st.rerun()
+            col_data, col_edit, col_del = st.columns([8, 1, 1])
+            with col_data:
+                st.markdown(
+                    f"{date_str} — {route_color} **{route_grade} {route_name}** — {status}{notes_display}"
+                )
+            with col_edit:
+                btn_key = f"attempt_{a.get('id')}"
+                if st.button("", key=btn_key+"_edit", icon=":material/edit:", type="tertiary"):
+                    display_attempt_form_edit(a)
+            with col_del:
+                if st.button("", key=btn_key+"_del", icon=":material/delete:", type="tertiary"):
+                    display_attempt_form_delete(a)
 else:
     if attempts:
         st.info("Aucune tentative ne correspond aux filtres sélectionnés.")

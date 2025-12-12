@@ -16,3 +16,6 @@ venv/
 
 # Data / logs locaux
 data/
+
+# Autre
+run.bat

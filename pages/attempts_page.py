@@ -84,58 +84,76 @@ def filter_attempts(attempts, routes):
 filtered_attempts = filter_attempts(attempts, routes)
 st.subheader(f"🎯 Mes tentatives ({len(filtered_attempts)}/{len(attempts)})")
 
-# --- BOUTON AJOUTER (GROS POUR MOBILE) ---
+# --- BOUTON AJOUTER ---
 if st.button("➕ Ajouter une tentative", key="add_attempt_button", use_container_width=True):
     st.session_state.show_attempt_form = True
 
-# --- FILTRES RAPIDES (PILLS HORIZONTALES) ---
+# --- FILTRES RAPIDES (PILLS) ---
 st.markdown("**Période**")
-col1, col2, col3, col4 = st.columns(4)
-with col1:
-    if st.button("Aujourd'hui", key="filter_today", 
-                 type="primary" if st.session_state.filter_period == "Aujourd'hui" else "secondary",
-                 use_container_width=True):
-        st.session_state.filter_period = "Aujourd'hui"
-        st.rerun()
-with col2:
-    if st.button("Semaine", key="filter_week",
-                 type="primary" if st.session_state.filter_period == "Cette semaine" else "secondary",
-                 use_container_width=True):
-        st.session_state.filter_period = "Cette semaine"
-        st.rerun()
-with col3:
-    if st.button("Mois", key="filter_month",
-                 type="primary" if st.session_state.filter_period == "Ce mois-ci" else "secondary",
-                 use_container_width=True):
-        st.session_state.filter_period = "Ce mois-ci"
-        st.rerun()
-with col4:
-    if st.button("Tout", key="filter_all",
-                 type="primary" if st.session_state.filter_period == "Tout" else "secondary",
-                 use_container_width=True):
-        st.session_state.filter_period = "Tout"
-        st.rerun()
+
+# Mapping entre les index et les valeurs
+period_options = ["Semaine", "Mois", "Tout"]
+
+# Trouver l'index actuel basé sur le session_state
+if st.session_state.filter_period == "Cette semaine":
+    current_index = 0
+elif st.session_state.filter_period == "Ce mois-ci":
+    current_index = 1
+else:  # "Tout"
+    current_index = 2
+
+selected_period = st.pills(
+    "filter_period_pills",
+    options=period_options,
+    selection_mode="single",
+    default=period_options[current_index],
+    label_visibility="collapsed"
+)
+# Convertir la sélection en valeur session_state
+if selected_period == "Aujourd'hui":
+    new_period = "Aujourd'hui"
+elif selected_period == "Semaine":
+    new_period = "Cette semaine"
+elif selected_period == "Mois":
+    new_period = "Ce mois-ci"
+else:
+    new_period = "Tout"
+# Mettre à jour si changement
+if new_period != st.session_state.filter_period:
+    st.session_state.filter_period = new_period
+    st.rerun()
+
+
 
 st.markdown("**Statut**")
-col1, col2, col3 = st.columns(3)
-with col1:
-    if st.button("Toutes", key="status_all",
-                 type="primary" if st.session_state.filter_status == "Toutes" else "secondary",
-                 use_container_width=True):
-        st.session_state.filter_status = "Toutes"
-        st.rerun()
-with col2:
-    if st.button("✅ Réussies", key="status_success",
-                 type="primary" if st.session_state.filter_status == "Réussies" else "secondary",
-                 use_container_width=True):
-        st.session_state.filter_status = "Réussies"
-        st.rerun()
-with col3:
-    if st.button("❌ Échouées", key="status_failed",
-                 type="primary" if st.session_state.filter_status == "Échouées" else "secondary",
-                 use_container_width=True):
-        st.session_state.filter_status = "Échouées"
-        st.rerun()
+status_options = ["Toutes", "✅ Réussies", "❌ Échouées"]
+# Trouver l'index actuel
+if st.session_state.filter_status == "Toutes":
+    status_index = 0
+elif st.session_state.filter_status == "Réussies":
+    status_index = 1
+else:
+    status_index = 2
+
+selected_status = st.pills(
+    "filter_status_pills",
+    options=status_options,
+    selection_mode="single",
+    default=status_options[status_index],
+    label_visibility="collapsed"
+)
+
+# Convertir en valeur session_state
+if selected_status == "Toutes":
+    new_status = "Toutes"
+elif selected_status == "✅ Réussies":
+    new_status = "Réussies"
+else:
+    new_status = "Échouées"
+
+if new_status != st.session_state.filter_status:
+    st.session_state.filter_status = new_status
+    st.rerun()
 
 # --- FILTRES AVANCÉS (COLLAPSIBLE) ---
 with st.expander("🔍 Filtres avancés"):

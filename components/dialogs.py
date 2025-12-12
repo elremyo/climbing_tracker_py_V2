@@ -17,7 +17,10 @@ def edit_route_dialog(route, on_save):
         on_save(name, grade, color)
         st.rerun()
     
-    RouteForm.render(route=route, on_submit=handle_submit)
+    def handle_cancel():
+        st.rerun()
+
+    RouteForm.render(route=route, on_submit=handle_submit, on_cancel=handle_cancel)
 
 
 @st.dialog("Éditer la tentative")
@@ -34,7 +37,10 @@ def edit_attempt_dialog(attempt, routes, on_save):
         on_save(route_id, success, notes, attempt_date)
         st.rerun()
     
-    AttemptForm.render(routes=routes, attempt=attempt, on_submit=handle_submit)
+    def handle_cancel():
+        st.rerun()
+
+    AttemptForm.render(routes=routes, attempt=attempt, on_submit=handle_submit, on_cancel=handle_cancel)
 
 @st.dialog("Confirmer la suppression")
 def confirm_delete_dialog(item_name, on_confirm):

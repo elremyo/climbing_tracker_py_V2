@@ -112,14 +112,3 @@ class FilterComponents:
             placeholder="Toutes les cotations"
         )
         st.session_state.filter_grades = selected_grades
-
-    @staticmethod
-    def grades_slider():
-        """Slider pour filtrer par cotations"""
-        min_grade, max_grade = st.slider(
-            "Plage de cotations",
-            0, len(GRADES)-1,
-            (0, len(GRADES)-1)
-        )
-        st.session_state.filter_min_grade = GRADES[min_grade]
-        st.session_state.filter_max_grade = GRADES[max_grade]

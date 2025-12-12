@@ -3,11 +3,6 @@ from utils.routes import get_routes, add_route, update_route, delete_route
 from utils.constants import ROUTE_COLORS, GRADES
 import pandas as pd
 
-
-routes = get_routes()
-
-st.subheader(f"🧗 Mes voies ({len(routes)})")
-
 # Initialisation des flags session_state
 if "show_form" not in st.session_state:
     st.session_state.show_form = False
@@ -18,11 +13,84 @@ if "show_edit_success" not in st.session_state:
 if "show_delete_success" not in st.session_state:
     st.session_state.show_delete_success = False
 
-# --- Bouton pour afficher le formulaire ---
-if st.button("➕ Ajouter une voie"):
+# Initialisation des filtres
+if "filter_colors" not in st.session_state:
+    st.session_state.filter_colors = []
+if "filter_grades" not in st.session_state:
+    st.session_state.filter_grades = []
+if "show_archived" not in st.session_state:
+    st.session_state.show_archived = True
+
+
+# --- FONCTION DE FILTRAGE ---
+def filter_routes(routes):
+    """Applique les filtres aux voies"""
+    filtered = routes.copy()
+    
+    # Filtre par couleurs
+    if st.session_state.filter_colors:
+        filtered = [r for r in filtered if r["color"] in st.session_state.filter_colors]
+    
+    # Filtre par cotations
+    if st.session_state.filter_grades:
+        filtered = [r for r in filtered if r["grade"] in st.session_state.filter_grades]
+    
+    # Filtre archivées
+    if not st.session_state.show_archived:
+        filtered = [r for r in filtered if not r.get("archived", False)]
+    
+    return filtered
+
+
+routes = get_routes()
+filtered_routes = filter_routes(routes)
+
+st.subheader(f"🧗 Mes voies ({len(filtered_routes)}/{len(routes)})")
+
+# --- BOUTON AJOUTER (GROS POUR MOBILE) ---
+if st.button("➕ Ajouter une voie", use_container_width=True):
     st.session_state.show_form = True
 
-# --- Formulaire d'ajout ---
+# --- FILTRES ---
+with st.expander("🔍 Filtres"):
+    # Filtre par couleurs
+    selected_colors = st.multiselect(
+        "Filtrer par couleurs",
+        options=list(ROUTE_COLORS.keys()),
+        default=st.session_state.filter_colors,
+        format_func=lambda c: f"{ROUTE_COLORS[c]} {c}",
+        placeholder="Toutes les couleurs"
+    )
+    st.session_state.filter_colors = selected_colors
+    
+    # Filtre par cotations
+    selected_grades = st.multiselect(
+        "Filtrer par cotations",
+        options=GRADES,
+        default=st.session_state.filter_grades,
+        placeholder="Toutes les cotations"
+    )
+    st.session_state.filter_grades = selected_grades
+    
+    # Toggle archivées
+    show_archived = st.checkbox(
+        "Afficher les voies archivées",
+        value=st.session_state.show_archived
+    )
+    if show_archived != st.session_state.show_archived:
+        st.session_state.show_archived = show_archived
+        st.rerun()
+    
+    # Bouton reset
+    if st.button("🔄 Réinitialiser les filtres", use_container_width=True):
+        st.session_state.filter_colors = []
+        st.session_state.filter_grades = []
+        st.session_state.show_archived = True
+        st.rerun()
+
+st.divider()
+
+# --- FORMULAIRE D'AJOUT ---
 if st.session_state.show_form:
     with st.form("add_route_form"):
         name = st.text_input("Nom")
@@ -40,7 +108,16 @@ if st.session_state.show_form:
             format_func=lambda c: f"{ROUTE_COLORS[c]} {c}"
         )
 
-        submitted = st.form_submit_button("Enregistrer")
+        col1, col2 = st.columns(2)
+        with col1:
+            submitted = st.form_submit_button("✅ Enregistrer", use_container_width=True)
+        with col2:
+            cancel = st.form_submit_button("❌ Annuler", use_container_width=True)
+        
+        if cancel:
+            st.session_state.show_form = False
+            st.rerun()
+        
         if submitted:
             errors = []
 
@@ -55,13 +132,12 @@ if st.session_state.show_form:
                 for err in errors:
                     st.error(err)
             else:
-                # on stocke juste "Rouge", "Bleue"... pas l'emoji !
                 add_route(name, grade, color)
                 st.session_state.show_add_success = True
                 st.session_state.show_form = False
                 st.rerun()
 
-@st.dialog("Éditer la route ")
+@st.dialog("Éditer la voie")
 def display_route_form_edit(route):
     with st.form("edit_route_form"):
         name = st.text_input("Nom", value=route["name"])
@@ -100,39 +176,12 @@ def display_route_form_edit(route):
                 st.session_state.show_edit_success = True
                 st.rerun()
 
-# --- Liste des voies ---
-
-
-
-# -------- Affichage tableau éditable --------
-df  = pd.DataFrame(
-    {"name": [r["name"] for r in routes],
-    "grade": [r["grade"] for r in routes],
-    "color": [ROUTE_COLORS.get(r["color"], "❓") for r in routes],
-    "archived": [True if r.get("archived", False) else False for r in routes]
-    }
-)
-
-st.data_editor(
-    df,
-    column_config={
-        "name": "Nom",
-        "grade": "Cotation",
-        "color": "Couleur",
-        "archived": "Archivée"
-    },
-    hide_index=True,
-    use_container_width=True)
-
-st.divider()
-#--------------------------------------------
-
-
-if routes:
-    for route in routes:
+# --- LISTE DES VOIES (RÉSULTATS FILTRÉS) ---
+if filtered_routes:
+    for route in filtered_routes:
         color_emoji = ROUTE_COLORS.get(route["color"], "❓")
         archived = route.get("archived", False)
-        # Ligne d’affichage (emoji + couleur + cotation + nom)
+        # Ligne d'affichage (emoji + couleur + cotation + nom)
         display = f"{color_emoji} **{route['grade']}** — {route['name']}"
         # Tag "archivée"
         if archived:
@@ -152,17 +201,20 @@ if routes:
                 st.rerun()
 
 else:
-    st.info("Aucune voie définie.")
+    if routes:
+        st.info("Aucune voie ne correspond aux filtres sélectionnés.")
+    else:
+        st.info("Aucune voie définie.")
 
 # --- Affichage du message de succès ---
 if st.session_state.show_add_success:
-    st.toast("Voie ajoutée !",icon = "✅")
-    st.session_state.show_add_success = False  # reset pour le prochain ajout
+    st.toast("✅ Voie ajoutée !", icon="✅")
+    st.session_state.show_add_success = False
 
 if st.session_state.show_edit_success:
-    st.toast("Voie modifiée !", icon="✅")
-    st.session_state.show_edit_success = False  # reset pour la prochaine édition
+    st.toast("✅ Voie modifiée !", icon="✅")
+    st.session_state.show_edit_success = False
 
 if st.session_state.show_delete_success:
-    st.toast("Voie supprimée !", icon="✅")
-    st.session_state.show_delete_success = False  # reset pour la prochaine suppression
+    st.toast("✅ Voie supprimée !", icon="✅")
+    st.session_state.show_delete_success = False

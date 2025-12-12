@@ -1,7 +1,6 @@
 import streamlit as st
-from utils.routes import get_routes
-from utils.attempts import get_attempts
-from utils.constants import ROUTE_COLORS, GRADES
+from data import get_routes, get_attempts
+from services.stats_service import StatsService
 from utils.formatting import format_date_fr
 
 st.subheader("📊 Tableau de bord")
@@ -14,66 +13,31 @@ if not attempts:
     st.stop()
 
 # Nombre total de tentatives
-total_attempts = len(attempts)
-st.metric("📊 Nombre total de tentatives", total_attempts, border=True)
+st.metric("📊 Nombre total de tentatives", len(attempts), border=True)
 
-# Taux de réussite global
-successful_attempts = sum(1 for a in attempts if a["success"])
-success_rate = (successful_attempts / total_attempts) * 100
+# Taux de réussite
+success_rate = StatsService.calculate_success_rate(attempts)
 st.metric("✅ Taux de réussite global", f"{success_rate:.1f} %", border=True)
 
-# Tentative la plus récente
-most_recent_attempt = max(attempts, key=lambda a: a["date"])
-attempt_date_str = format_date_fr(most_recent_attempt["date"])
-st.metric("📅 Dernière tentative", attempt_date_str, border=True)
+# Dernière tentative
+most_recent = max(attempts, key=lambda a: a["date"])
+st.metric("📅 Dernière tentative", format_date_fr(most_recent["date"]), border=True)
 
 # Voie la plus tentée
-from collections import Counter
-route_counter = Counter(a["route_id"] for a in attempts)
-most_common_route_id, most_common_count = route_counter.most_common(1)[0]
-most_common_route = next((r for r in routes if r["id"] == most_common_route_id), None)
-if most_common_route:
-    route_name = most_common_route["name"]
-    st.metric("💪 Voie la plus tentée", f"{route_name} ({most_common_count} fois)", border=True)
+route, count = StatsService.get_most_attempted_route(attempts, routes)
+if route:
+    st.metric("💪 Voie la plus tentée", f"{route['name']} ({count} fois)", border=True)
 else:
-    # ✅ Gestion du cas où la voie a été supprimée
-    st.metric("💪 Voie la plus tentée", f"Voie supprimée ({most_common_count} fois)", border=True)
+    st.metric("💪 Voie la plus tentée", f"Voie supprimée ({count} fois)", border=True)
 
 # Voie la plus difficile réussie
-# ✅ On filtre pour ne garder que les tentatives avec des voies existantes
-successful_attempts_with_routes = []
-for a in attempts:
-    if a["success"]:
-        route = next((r for r in routes if r["id"] == a["route_id"]), None)
-        if route:  # On ne garde que si la voie existe toujours
-            successful_attempts_with_routes.append((a, route))
+attempt, route = StatsService.get_hardest_completed_route(attempts, routes)
+if route:
+    st.metric("🏆Meilleure difficulté", f"{route['grade']} ({route['name']})", border=True)
 
-if successful_attempts_with_routes:
-    # Tri par difficulté (index dans GRADES)
-    successful_attempts_sorted = sorted(
-        successful_attempts_with_routes,
-        key=lambda item: GRADES.index(item[1]["grade"]) if item[1]["grade"] in GRADES else -1,
-        reverse=True
-    )
-    hardest_attempt, hardest_route = successful_attempts_sorted[0]
-    st.metric("🏆Meilleure difficulté", f"{hardest_route['grade']} ({hardest_route['name']})", border=True)
-
-# Affichage des statistiques par niveau de difficulté
+# Statistiques par niveau
 st.subheader("Statistiques par niveau de difficulté")
-grade_stats = {}
-for grade in GRADES:
-    # ✅ On filtre pour ne compter que les tentatives avec voies existantes
-    grade_attempts = []
-    for a in attempts:
-        route = next((r for r in routes if r["id"] == a["route_id"]), None)
-        if route and route.get("grade") == grade:
-            grade_attempts.append(a)
-    
-    if grade_attempts:
-        total = len(grade_attempts)
-        successful = sum(1 for a in grade_attempts if a["success"])
-        rate = (successful / total) * 100
-        grade_stats[grade] = (total, successful, rate)
+grade_stats = StatsService.calculate_grade_stats(attempts, routes)
 
 if grade_stats:
     for grade, (total, successful, rate) in grade_stats.items():

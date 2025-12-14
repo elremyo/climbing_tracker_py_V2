@@ -42,19 +42,18 @@ def edit_attempt_dialog(attempt, routes, on_save):
 
     AttemptForm.render(routes=routes, attempt=attempt, on_submit=handle_submit, on_cancel=handle_cancel)
 
-@st.dialog("Confirmer la suppression")
-def confirm_delete_dialog(item_name, on_confirm):
+@st.dialog("Confirmer l'archivage")
+def confirm_archive_dialog(item_name, on_confirm):
     """
-    Modal de confirmation de suppression.
+    Modal de confirmation de l'archivage.
     
     Args:
-        item_name: nom de l'élément à supprimer
+        item_name: nom de l'élément à archiver
         on_confirm: callback() appelé si l'utilisateur confirme
     """
-    st.warning(f"Es-tu sûr de vouloir supprimer **{item_name}** ?")
-    st.markdown("Cette action est **irréversible**.")
+    st.markdown(f"Es-tu sûr de vouloir archiver **{item_name}** ?")
 
-    if st.button("Supprimer", use_container_width=True, type="primary"):
+    if st.button("Archiver", use_container_width=True, type="primary"):
         on_confirm()
         st.rerun()
 

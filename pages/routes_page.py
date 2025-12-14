@@ -67,14 +67,14 @@ if filtered_routes:
         
         def make_archive_handler(r):
             def handler():
-                from components.dialogs import confirm_delete_dialog
+                from components.dialogs import confirm_archive_dialog
                 
                 # Callback de confirmation
                 def on_confirm():
                     archive_route(r["id"])
                     st.toast("✅ Voie archivée !", icon="✅")
                 
-                confirm_delete_dialog(f"{r['grade']} {r['name']}", on_confirm)
+                confirm_archive_dialog(f"{r['grade']} {r['name']}", on_confirm)
             return handler
         
         def make_unarchive_handler(r):

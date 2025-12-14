@@ -35,12 +35,30 @@ st.subheader(f"Mes tentatives ({len(filtered_attempts)}/{len(attempts)})")
 if st.button("Ajouter une tentative", key="add_attempt_button",  icon=":material/add:", use_container_width=True,type="primary"):
     st.session_state.show_attempt_form = True
 
+# Formulaire d'ajout
+if st.session_state.show_attempt_form:
+    if not routes:
+        st.warning("Ajoute d'abord une voie avant d'enregistrer une tentative.")
+    else:
+        def handle_submit(route_id, success, notes, attempt_date):
+            add_attempt(route_id, success, notes, attempt_date)
+            st.session_state.show_attempt_success = True
+            st.session_state.show_attempt_form = False
+            st.rerun()
+        
+        def handle_cancel():
+            st.session_state.show_attempt_form = False
+            st.rerun()
+        
+        AttemptForm.render(routes=routes, on_submit=handle_submit, on_cancel=handle_cancel)
+
+
 # Filtres rapides
-FilterComponents.period_filter()
 FilterComponents.status_filter()
 
 # Filtres avancés
 with st.expander("Filtres avancés"):
+    FilterComponents.period_filter()
     FilterComponents.routes_multiselect(routes)
     
     sort_option = st.radio(
@@ -58,23 +76,6 @@ with st.expander("Filtres avancés"):
         st.rerun()
 
 st.divider()
-
-# Formulaire d'ajout
-if st.session_state.show_attempt_form:
-    if not routes:
-        st.warning("Ajoute d'abord une voie avant d'enregistrer une tentative.")
-    else:
-        def handle_submit(route_id, success, notes, attempt_date):
-            add_attempt(route_id, success, notes, attempt_date)
-            st.session_state.show_attempt_success = True
-            st.session_state.show_attempt_form = False
-            st.rerun()
-        
-        def handle_cancel():
-            st.session_state.show_attempt_form = False
-            st.rerun()
-        
-        AttemptForm.render(routes=routes, on_submit=handle_submit, on_cancel=handle_cancel)
 
 # Liste des tentatives
 if filtered_attempts:

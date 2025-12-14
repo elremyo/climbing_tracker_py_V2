@@ -21,6 +21,20 @@ st.subheader(f"Mes voies ({len(filtered_routes)}/{len(routes)})")
 if st.button("Ajouter une voie", icon=":material/add:", use_container_width=True,type="primary"):
     st.session_state.show_form = True
 
+# Formulaire d'ajout
+if st.session_state.show_form:
+    def handle_submit(name, grade, color):
+        add_route(name, grade, color)
+        st.session_state.show_add_success = True
+        st.session_state.show_form = False
+        st.rerun()
+    
+    def handle_cancel():
+        st.session_state.show_form = False
+        st.rerun()
+    
+    RouteForm.render(on_submit=handle_submit, on_cancel=handle_cancel)
+
 # Filtres
 with st.expander("Filtres"):
     FilterComponents.colors_multiselect()
@@ -39,20 +53,6 @@ with st.expander("Filtres"):
         st.rerun()
 
 st.divider()
-
-# Formulaire d'ajout
-if st.session_state.show_form:
-    def handle_submit(name, grade, color):
-        add_route(name, grade, color)
-        st.session_state.show_add_success = True
-        st.session_state.show_form = False
-        st.rerun()
-    
-    def handle_cancel():
-        st.session_state.show_form = False
-        st.rerun()
-    
-    RouteForm.render(on_submit=handle_submit, on_cancel=handle_cancel)
 
 # Liste des voies
 if filtered_routes:

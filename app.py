@@ -7,7 +7,12 @@ st.set_page_config(
     layout="wide"
 )
 
-st.header("Header",anchor=False, divider="orange", text_alignment="center",width="content")
+st.header("⛰️ Climbing tracker",anchor=False, divider="orange", text_alignment="center",width="content")
+
+with st.container(horizontal=True,gap="small", vertical_alignment="center"):
+    st.page_link("pages/dashboard_page.py", label="Dashboard", icon="📊")
+    st.page_link("pages/routes_page.py", label="Voies", icon="🧗")
+    st.page_link("pages/attempts_page.py", label="Tentatives", icon="🎯")
 
 # définition des pages
 pages = [
@@ -16,5 +21,5 @@ pages = [
     st.Page("pages/attempts_page.py", title="Tentatives", icon="🎯")
 ]
 
-current = st.navigation(pages,position="top")
+current = st.navigation(pages,position="hidden")
 current.run()

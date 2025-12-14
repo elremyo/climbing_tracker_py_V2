@@ -22,39 +22,26 @@ class RouteCard:
         color_emoji = ROUTE_COLORS.get(route["color"], "❓")
         archived = route.get("archived", False)
         
-        display = f"{color_emoji} **{route['grade']}** — {route['name']}"
+        display = f"{color_emoji} **{route['grade']}** - :small[{route['name']}]"
         if archived:
-            display += " — :material/lock: _Archivée_"
-        
-        if archived:
-            # Pour les voies archivées : bouton réactiver
-            col_data, col_edit, col_unarchive = st.columns([8, 1, 1])
-        else:
-            # Pour les voies actives : boutons éditer et archiver
-            col_data, col_edit, col_archive = st.columns([8, 1, 1])
-        
-        with col_data:
+            display = f''':grey[{display + " - :material/lock: _Archivée_"}]''' 
+
+        with st.container(horizontal=True,border=True,vertical_alignment="center"):
             st.markdown(display)
-        
-        with col_edit:
             if on_edit:
                 btn_key = f"route_{route.get('id')}_edit"
                 if st.button("", key=btn_key, icon=":material/edit:", help="Éditer",type="tertiary"):
                     on_edit()
-        
-        if archived:
-            with col_unarchive:
+            if archived:
                 if on_unarchive:
                     btn_key = f"route_{route.get('id')}_unarchive"
                     if st.button("", key=btn_key, icon=":material/lock_reset:", help="Réactiver",type="tertiary"):
                         on_unarchive()
-        else:
-            with col_archive:
+            else:
                 if on_archive:
                     btn_key = f"route_{route.get('id')}_archive"
                     if st.button("", key=btn_key, icon=":material/archive:", help="Archiver",type="tertiary"):
                         on_archive()
-
 
 class AttemptCard:
     """Affichage d'une tentative"""
@@ -84,26 +71,27 @@ class AttemptCard:
         date_str = format_date_fr(attempt["date"])
         
         # Status
-        status = "✅ Réussie" if attempt.get("success") else "❌ Échouée"
-        
+        if attempt.get("success"):
+            status = ":green-badge[:material/check: Réussie]"
+        else:
+            status = ":red-badge[:material/close: Échouée]"        
         # Notes
         notes = attempt.get("notes")
-        notes_display = f" — *{notes}*" if notes and notes.strip() else ""
+        if notes and notes.strip():
+            notes = notes.strip()
+        notes_display = f"*{notes}*" if notes and notes.strip() else ""
         
-        col_data, col_edit, col_del = st.columns([8, 1, 1])
         
-        with col_data:
-            st.markdown(
-                f"{date_str} — {route_color} **{route_grade} {route_name}** — {status}{notes_display}"
-            )
-        
-        with col_edit:
+        with st.container(horizontal=True,border=True,vertical_alignment="center"):
+            with st.container():
+                st.markdown(f"{date_str} - {route_color} **{route_grade} {route_name}**")
+                st.markdown(f"{status}")
+                st.markdown(f":small[{notes_display}]")
             if on_edit:
                 btn_key = f"attempt_{attempt.get('id')}_edit"
                 if st.button("", key=btn_key, icon=":material/edit:", help="Éditer",type="tertiary"):
                     on_edit()
-        
-        with col_del:
+
             if on_delete:
                 btn_key = f"attempt_{attempt.get('id')}_del"
                 if st.button("", key=btn_key, icon=":material/delete:", help="Supprimer",type="tertiary"):

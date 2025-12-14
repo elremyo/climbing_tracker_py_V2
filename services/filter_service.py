@@ -2,6 +2,7 @@
 Logique de filtrage et tri pour routes et attempts.
 """
 from datetime import date, datetime, timedelta
+from utils.constants import GRADES
 import streamlit as st
 
 class FilterService:
@@ -20,6 +21,12 @@ class FilterService:
         if st.session_state.filter_grades:
             filtered = [r for r in filtered if r["grade"] in st.session_state.filter_grades]
         
+        # Filtre par plage de cotations (nouveau)
+        min_idx = GRADES.index(st.session_state.filter_min_grade)
+        max_idx = GRADES.index(st.session_state.filter_max_grade)
+        filtered = [r for r in filtered 
+                    if r["grade"] in GRADES[min_idx:max_idx+1]]
+
         # Filtre archivées
         if not st.session_state.show_archived:
             filtered = [r for r in filtered if not r.get("archived", False)]

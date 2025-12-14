@@ -2,6 +2,7 @@
 Gestion centralisée du session_state pour éviter la duplication.
 """
 import streamlit as st
+from utils.constants import GRADES
 
 class SessionStateService:
     """Service de gestion du session_state"""
@@ -17,6 +18,8 @@ class SessionStateService:
             "filter_colors": [],
             "filter_grades": [],
             "show_archived": True,
+            "filter_min_grade": GRADES[0],
+            "filter_max_grade": GRADES[-1],
         }
         for key, value in defaults.items():
             if key not in st.session_state:
@@ -43,6 +46,8 @@ class SessionStateService:
         st.session_state.filter_colors = []
         st.session_state.filter_grades = []
         st.session_state.show_archived = True
+        st.session_state.filter_min_grade = GRADES[0]
+        st.session_state.filter_max_grade = GRADES[-1]
     
     @staticmethod
     def reset_attempts_filters():

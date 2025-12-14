@@ -36,8 +36,8 @@ if st.button("Ajouter une tentative", key="add_attempt_button",  icon=":material
     st.session_state.show_attempt_form = True
 
 # Filtres rapides
-FilterComponents.period_pills()
-FilterComponents.status_pills()
+FilterComponents.period_filter()
+FilterComponents.status_filter()
 
 # Filtres avancés
 with st.expander("Filtres avancés"):

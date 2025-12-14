@@ -8,8 +8,8 @@ class FilterComponents:
     """Composants UI pour les filtres"""
     
     @staticmethod
-    def period_pills():
-        """Pills de sélection de période"""
+    def period_filter():
+        """Filtre de sélection de période"""
 
         period_options = ["Aujourd'hui", "Semaine", "Mois", "Tout"]
         
@@ -22,7 +22,7 @@ class FilterComponents:
         }
         current_period = current_map.get(st.session_state.filter_period, "Tout")
         
-        selected = st.pills(
+        selected = st.segmented_control(
             "Période",
             options=period_options,
             selection_mode="single",
@@ -43,8 +43,8 @@ class FilterComponents:
             st.rerun()
     
     @staticmethod
-    def status_pills():
-        """Pills de sélection de statut"""
+    def status_filter():
+        """Filtre de sélection de statut"""
         
         status_options = ["Toutes", "✅ Réussies", "❌ Échouées"]
         
@@ -56,7 +56,7 @@ class FilterComponents:
         }
         current_status = current_map[st.session_state.filter_status]
         
-        selected = st.pills(
+        selected = st.segmented_control(
             "Statut",
             options=status_options,
             selection_mode="single",

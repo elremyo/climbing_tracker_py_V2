@@ -23,8 +23,8 @@ if st.button("Ajouter une voie", icon=":material/add:", use_container_width=True
 
 # Formulaire d'ajout
 if st.session_state.show_form:
-    def handle_submit(name, grade, color):
-        add_route(name, grade, color)
+    def handle_submit(name, grade, color, type):
+        add_route(name, grade, color, type)
         st.session_state.show_add_success = True
         st.session_state.show_form = False
         st.rerun()
@@ -59,8 +59,8 @@ if filtered_routes:
     for route in filtered_routes:
         def make_edit_handler(r):
             def handler():
-                def save_handler(name, grade, color):
-                    update_route(r["id"], name=name, grade=grade, color=color)
+                def save_handler(name, grade, color,type):
+                    update_route(r["id"], name=name, grade=grade, color=color, type=type)
                     st.session_state.show_edit_success = True
                 edit_route_dialog(r, save_handler)
             return handler

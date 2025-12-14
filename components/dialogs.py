@@ -13,8 +13,8 @@ def edit_route_dialog(route, on_save):
         route: dict de la voie à éditer
         on_save: callback(name, grade, color) appelé lors de la sauvegarde
     """
-    def handle_submit(name, grade, color):
-        on_save(name, grade, color)
+    def handle_submit(name, grade, color,type):
+        on_save(name, grade, color,type)
         st.rerun()
     
     def handle_cancel():

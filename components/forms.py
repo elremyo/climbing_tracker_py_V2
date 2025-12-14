@@ -3,7 +3,7 @@ Formulaires réutilisables pour routes et attempts.
 """
 import streamlit as st
 from datetime import date
-from utils.constants import ROUTE_COLORS, GRADES
+from utils.constants import ROUTE_COLORS, GRADES, ROUTE_TYPES
 
 class RouteForm:
     """Formulaire de voie (add ou edit)"""
@@ -35,7 +35,14 @@ class RouteForm:
                 index=list(ROUTE_COLORS.keys()).index(route["color"]) if route and route["color"] in ROUTE_COLORS else 0,
                 format_func=lambda c: f"{ROUTE_COLORS[c]} {c}"
             )
-            
+
+            type = st.selectbox(
+                "Type (optionnel)",
+                options=list(ROUTE_TYPES.keys()),
+                index=list(ROUTE_TYPES.keys()).index(route["type"]) if route and route.get("type") in ROUTE_TYPES else 0,
+                help=f"{' | '.join([f'**{k}**: {v}' for k,v in ROUTE_TYPES.items()])}"
+                )
+
             submitted = st.form_submit_button("Enregistrer", use_container_width=True,type="primary")
             cancel = st.form_submit_button("Annuler", use_container_width=True, type="secondary")
             
@@ -55,7 +62,7 @@ class RouteForm:
                     for err in errors:
                         st.error(err)
                 elif on_submit:
-                    on_submit(name, grade, color)
+                    on_submit(name, grade, color,type)
 
 
 class AttemptForm:

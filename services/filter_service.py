@@ -17,10 +17,6 @@ class FilterService:
         if st.session_state.filter_colors:
             filtered = [r for r in filtered if r["color"] in st.session_state.filter_colors]
         
-        # Filtre par cotations
-        if st.session_state.filter_grades:
-            filtered = [r for r in filtered if r["grade"] in st.session_state.filter_grades]
-        
         # Filtre par plage de cotations (nouveau)
         min_idx = GRADES.index(st.session_state.filter_min_grade)
         max_idx = GRADES.index(st.session_state.filter_max_grade)

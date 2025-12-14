@@ -38,7 +38,6 @@ if st.session_state.show_form:
 # Filtres
 with st.expander("Filtres"):
     FilterComponents.colors_multiselect()
-    FilterComponents.grades_multiselect()
     FilterComponents.grades_range_slider()
     
     show_archived = st.checkbox(

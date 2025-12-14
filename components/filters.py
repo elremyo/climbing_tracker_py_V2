@@ -101,17 +101,6 @@ class FilterComponents:
             placeholder="Toutes les couleurs"
         )
         st.session_state.filter_colors = selected_colors
-    
-    @staticmethod
-    def grades_multiselect():
-        """Multiselect pour filtrer par cotations"""
-        selected_grades = st.multiselect(
-            "Filtrer par cotations",
-            options=GRADES,
-            default=st.session_state.filter_grades,
-            placeholder="Toutes les cotations"
-        )
-        st.session_state.filter_grades = selected_grades
 
     @staticmethod
     def grades_range_slider():

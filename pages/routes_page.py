@@ -7,6 +7,7 @@ from components.forms import RouteForm
 from components.cards import RouteCard
 from components.dialogs import edit_route_dialog
 
+
 # Initialisation
 SessionStateService.init_routes_state()
 
@@ -57,6 +58,12 @@ st.divider()
 # Liste des voies
 if filtered_routes:
     for route in filtered_routes:
+        def make_click_handler(r):
+            def handler():
+                st.query_params.from_dict({"route_id": str(r["id"])})
+                st.switch_page("pages/route_detail_page.py",query_params={"route_id": str(r["id"])})
+            return handler
+
         def make_edit_handler(r):
             def handler():
                 def save_handler(name, grade, color,type):
@@ -86,6 +93,7 @@ if filtered_routes:
         
         RouteCard.render(
             route,
+            on_click=make_click_handler(route),
             on_edit=make_edit_handler(route),
             on_archive=make_archive_handler(route),
             on_unarchive=make_unarchive_handler(route)

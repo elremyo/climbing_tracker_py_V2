@@ -9,7 +9,7 @@ class RouteCard:
     """Affichage d'une voie"""
     
     @staticmethod
-    def render(route, on_edit=None, on_archive=None, on_unarchive=None):
+    def render(route, on_edit=None, on_archive=None, on_unarchive=None, on_click=None):
         """
         Affiche une carte de voie.
         
@@ -18,6 +18,7 @@ class RouteCard:
             on_edit: callback() appelé au clic sur éditer
             on_archive: callback() appelé au clic sur archiver
             on_unarchive: callback() appelé au clic sur réactiver
+            on_click: callback() appelé au clic sur la carte (NOUVEAU)
         """
         color_emoji = ROUTE_COLORS.get(route["color"], "❓")
         archived = route.get("archived", False)
@@ -28,28 +29,36 @@ class RouteCard:
         if archived:
             display = f''':grey[{display + " - :material/lock: _Archivée_"}]''' 
 
-        with st.container(horizontal=True,border=True,vertical_alignment="center"):
-            st.markdown(display)
+        with st.container(horizontal=True, border=True, vertical_alignment="center"):
+            st.markdown(display,text_alignment="left")
+            
+            # Boutons d'actions
+            if on_click and not archived:
+                if st.button("", key=f"route_{route.get('id')}_click",icon=":material/search:", help="Détail",type="tertiary"):
+                    on_click()
+
             if on_edit:
                 btn_key = f"route_{route.get('id')}_edit"
-                if st.button("", key=btn_key, icon=":material/edit:", help="Éditer",type="tertiary"):
+                if st.button("", key=btn_key, icon=":material/edit:", help="Éditer", type="tertiary"):
                     on_edit()
+            
             if archived:
                 if on_unarchive:
                     btn_key = f"route_{route.get('id')}_unarchive"
-                    if st.button("", key=btn_key, icon=":material/lock_reset:", help="Réactiver",type="tertiary"):
+                    if st.button("", key=btn_key, icon=":material/lock_reset:", help="Réactiver", type="tertiary"):
                         on_unarchive()
             else:
                 if on_archive:
                     btn_key = f"route_{route.get('id')}_archive"
-                    if st.button("", key=btn_key, icon=":material/archive:", help="Archiver",type="tertiary"):
+                    if st.button("", key=btn_key, icon=":material/archive:", help="Archiver", type="tertiary"):
                         on_archive()
+
 
 class AttemptCard:
     """Affichage d'une tentative"""
     
     @staticmethod
-    def render(attempt, route, on_edit=None, on_delete=None):
+    def render(attempt, route, on_edit=None, on_delete=None, show_route_info=True):
         """
         Affiche une carte de tentative.
         
@@ -58,16 +67,20 @@ class AttemptCard:
             route: dict de la voie (ou None si supprimée)
             on_edit: callback() appelé au clic sur éditer
             on_delete: callback() appelé au clic sur supprimer
+            show_route_info: bool, afficher les infos de la voie (défaut: True)
+
         """
         # Infos de la voie
-        if route:
-            route_name = route["name"]
-            route_color = ROUTE_COLORS.get(route["color"], "❓")
-            route_grade = route["grade"]
+        if show_route_info:
+            if route:
+                route_name = route["name"]
+                route_color = ROUTE_COLORS.get(route["color"], "❓")
+                route_grade = route["grade"]
+                route_display = f"{route_color} **{route_grade} {route_name}**"
+            else:
+                route_display = "❓ **Voie supprimée**"
         else:
-            route_name = "Voie supprimée"
-            route_color = "❓"
-            route_grade = ""
+            route_display = None
         
         # Format date
         date_str = format_date_fr(attempt["date"])
@@ -77,24 +90,29 @@ class AttemptCard:
             status = ":green-badge[:material/check: Réussie]"
         else:
             status = ":red-badge[:material/close: Échouée]"        
+        
         # Notes
         notes = attempt.get("notes")
         if notes and notes.strip():
             notes = notes.strip()
         notes_display = f"*{notes}*" if notes and notes.strip() else ""
         
-        
-        with st.container(horizontal=True,border=True,vertical_alignment="center"):
+        with st.container(horizontal=True, border=True, vertical_alignment="center"):
             with st.container():
-                st.markdown(f"{date_str} - {route_color} **{route_grade} {route_name}**")
+
+                if route_display:
+                    st.markdown(f"{date_str} - {route_display}")
+                else:
+                    st.markdown(f"**{date_str}**")
                 st.markdown(f"{status}")
                 st.markdown(f":small[{notes_display}]")
+            
             if on_edit:
                 btn_key = f"attempt_{attempt.get('id')}_edit"
-                if st.button("", key=btn_key, icon=":material/edit:", help="Éditer",type="tertiary"):
+                if st.button("", key=btn_key, icon=":material/edit:", help="Éditer", type="tertiary"):
                     on_edit()
 
             if on_delete:
                 btn_key = f"attempt_{attempt.get('id')}_del"
-                if st.button("", key=btn_key, icon=":material/delete:", help="Supprimer",type="tertiary"):
+                if st.button("", key=btn_key, icon=":material/delete:", help="Supprimer", type="tertiary"):
                     on_delete()

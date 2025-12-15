@@ -86,7 +86,7 @@ if filtered_attempts:
             def handler():
                 def save_handler(route_id, success, notes, attempt_date):
                     update_attempt(attempt["id"], route_id, success, notes, attempt_date)
-                    st.toast("✅ Tentative modifiée !", icon="✅")
+                    st.toast("Tentative modifiée !", icon="✅")
                 edit_attempt_dialog(attempt, routes, save_handler)
             return handler
         
@@ -104,7 +104,7 @@ if filtered_attempts:
                 # Callback de confirmation
                 def on_confirm():
                     delete_attempt(attempt["id"])
-                    st.toast("✅ Tentative supprimée !", icon="✅")
+                    st.toast("Tentative supprimée !", icon="✅")
                 
                 confirm_archive_dialog(display_name, on_confirm)
             return handler
@@ -123,5 +123,5 @@ else:
 
 # Message de succès
 if st.session_state.show_attempt_success:
-    st.toast("✅ Tentative enregistrée !", icon="✅")
+    st.toast("Tentative enregistrée !", icon="✅")
     st.session_state.show_attempt_success = False

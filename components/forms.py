@@ -32,16 +32,22 @@ class RouteForm:
             color = st.selectbox(
                 "Couleur",
                 options=list(ROUTE_COLORS.keys()),
-                index=list(ROUTE_COLORS.keys()).index(route["color"]) if route and route["color"] in ROUTE_COLORS else 0,
+                index=list(ROUTE_COLORS.keys()).index(route["color"]) if route and route["color"] in ROUTE_COLORS else None,
                 format_func=lambda c: f"{ROUTE_COLORS[c]} {c}"
             )
 
+
+            type_options = [""] + list(ROUTE_TYPES.keys())
+            default_index = 0
+            if route and route.get("type") in ROUTE_TYPES:
+                default_index = type_options.index(route["type"])
+
             type = st.selectbox(
                 "Type (optionnel)",
-                options=list(ROUTE_TYPES.keys()),
-                index=list(ROUTE_TYPES.keys()).index(route["type"]) if route and route.get("type") in ROUTE_TYPES else 0,
+                options=type_options,
+                index=default_index,
                 help=f"{' | '.join([f'**{k}**: {v}' for k,v in ROUTE_TYPES.items()])}"
-                )
+            )
 
             submitted = st.form_submit_button("Enregistrer", use_container_width=True,type="primary")
             cancel = st.form_submit_button("Annuler", use_container_width=True, type="secondary")

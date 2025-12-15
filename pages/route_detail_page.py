@@ -73,7 +73,7 @@ if route_attempts:
                 def save_handler(route_id, success, notes, attempt_date):
                     from data import update_attempt
                     update_attempt(a["id"], route_id, success, notes, attempt_date)
-                    st.toast("✅ Tentative modifiée !", icon="✅")
+                    st.toast("Tentative modifiée !", icon="✅")
                 edit_attempt_dialog(a, [route], save_handler)
             return handler
 
@@ -83,7 +83,7 @@ if route_attempts:
                 from data import delete_attempt
                 def on_confirm():
                     delete_attempt(a["id"])
-                    st.toast("✅ Tentative supprimée !", icon="✅")
+                    st.toast("Tentative supprimée !", icon="✅")
                 confirm_archive_dialog(f"tentative du {format_date_fr(a['date'])}", on_confirm)
             return handler
 

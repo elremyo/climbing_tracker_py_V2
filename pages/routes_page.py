@@ -79,7 +79,7 @@ if filtered_routes:
                 # Callback de confirmation
                 def on_confirm():
                     archive_route(r["id"])
-                    st.toast("✅ Voie archivée !", icon="✅")
+                    st.toast("Voie archivée !", icon="✅")
                 
                 confirm_archive_dialog(f"{r['grade']} {r['name']}", on_confirm)
             return handler
@@ -87,7 +87,7 @@ if filtered_routes:
         def make_unarchive_handler(r):
             def handler():
                 unarchive_route(r["id"])
-                st.toast("✅ Voie réactivée !", icon="✅")
+                st.toast("Voie réactivée !", icon="✅")
                 st.rerun()
             return handler
         
@@ -106,9 +106,9 @@ else:
 
 # Messages de succès
 if st.session_state.show_add_success:
-    st.toast("✅ Voie ajoutée !", icon="✅")
+    st.toast("Voie ajoutée !", icon="✅")
     st.session_state.show_add_success = False
 
 if st.session_state.show_edit_success:
-    st.toast("✅ Voie modifiée !", icon="✅")
+    st.toast("Voie modifiée !", icon="✅")
     st.session_state.show_edit_success = False

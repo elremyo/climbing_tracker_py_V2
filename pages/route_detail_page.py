@@ -51,44 +51,48 @@ with col2:
     st.subheader(f"{color_emoji} {route['grade']} - {route['name']}{type_display}{archived_badge}")
 
 # ===== STATISTIQUES PRINCIPALES =====
-col1, col2, col3, col4 = st.columns(4)
 
-with col1:
-    st.metric("Tentatives", stats['total'], border=True)
 
-with col2:
-    if stats['total'] > 0:
-        st.metric(
-            "Taux de réussite",
-            f"{stats['success_rate']:.0f}%",
-            border=True
-        )
-    else:
-        st.metric("Taux de réussite", "—", border=True)
+if route_attempts:
+    col1, col2, col3, col4 = st.columns(4)
+    with col1:
+        st.metric("Tentatives", stats['total'], border=True)
 
-with col3:
-    if stats['first_attempt_date']:
-        st.metric(
-            "Première tentative",
-            format_date_fr(stats['first_attempt_date']),
-            border=True
-        )
-    else:
-        st.metric("Première tentative", "—", border=True)
+    with col2:
+        if stats['total'] > 0:
+            st.metric(
+                "Taux de réussite",
+                f"{stats['success_rate']:.0f}%",
+                border=True
+            )
+        else:
+            st.metric("Taux de réussite", "—", border=True)
 
-with col4:
-    if stats['last_attempt_date']:
-        st.metric(
-            "Dernière tentative",
-            format_date_fr(stats['last_attempt_date']),
-            border=True
-        )
-    else:
-        st.metric("Dernière tentative", "—", border=True)
+    with col3:
+        if stats['first_attempt_date']:
+            st.metric(
+                "Première tentative",
+                format_date_fr(stats['first_attempt_date']),
+                border=True
+            )
+        else:
+            st.metric("Première tentative", "—", border=True)
 
-st.divider()
+    with col4:
+        if stats['last_attempt_date']:
+            st.metric(
+                "Dernière tentative",
+                format_date_fr(stats['last_attempt_date']),
+                border=True
+            )
+        else:
+            st.metric("Dernière tentative", "—", border=True)
+    
+
 
 # ===== HISTORIQUE DES TENTATIVES =====
+st.divider()
+
 st.markdown("### 🎯 Historique des tentatives")
 
 if route_attempts:
@@ -126,6 +130,6 @@ if route_attempts:
 
 else:
     st.info("Aucune tentative enregistrée pour cette voie.")
-    
+
 if st.button("Ajouter une tentative", icon=":material/add:", type="primary"):
     st.switch_page("pages/attempts_page.py")

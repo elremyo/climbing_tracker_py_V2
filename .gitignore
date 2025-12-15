@@ -14,9 +14,6 @@ venv/
 # Streamlit
 .streamlit/
 
-# Data / logs locaux
-data/
-
 # Autre
 run.bat
 guide.md

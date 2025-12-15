@@ -5,10 +5,8 @@ from components.cards import AttemptCard
 from utils.constants import ROUTE_COLORS, ROUTE_TYPES
 from utils.formatting import format_date_fr
 
-st.write("# Détail de la voie")
 
 # Récupération du route_id depuis les query params
-
 query_params = st.query_params
 route_id = st.query_params.get("route_id", None) 
 
@@ -38,62 +36,31 @@ route_attempts = [a for a in attempts if str(a["route_id"]) == str(route_id)]
 stats = RouteStatsService.get_route_stats(route_attempts)
 
 # ===== HEADER =====
-col1, col2 = st.columns([1, 6])
-with col1:
-    if st.button("", icon=":material/arrow_back:", help="Retour", type="tertiary"):
-        st.switch_page("pages/routes_page.py")
+st.subheader(" Détail de la voie")
 
-with col2:
+with st.container(border=False, vertical_alignment="bottom", horizontal=True, gap="small"):
+    if st.button("", icon=":material/arrow_back:", help="Retour", type="tertiary"):
+            st.switch_page("pages/routes_page.py")
+
     color_emoji = ROUTE_COLORS.get(route["color"], "❓")
     route_type = route.get("type")
-    type_display = f" • {ROUTE_TYPES.get(route_type, route_type)}" if route_type else ""
+    type_display = f" :violet-badge[{route_type}]" if route_type else ""
     archived_badge = " :red-badge[Archivée]" if route.get("archived") else ""
     st.subheader(f"{color_emoji} {route['grade']} - {route['name']}{type_display}{archived_badge}")
+
 
 # ===== STATISTIQUES PRINCIPALES =====
 
 
 if route_attempts:
-    col1, col2, col3, col4 = st.columns(4)
-    with col1:
-        st.metric("Tentatives", stats['total'], border=True)
-
-    with col2:
-        if stats['total'] > 0:
-            st.metric(
-                "Taux de réussite",
-                f"{stats['success_rate']:.0f}%",
-                border=True
-            )
-        else:
-            st.metric("Taux de réussite", "—", border=True)
-
-    with col3:
-        if stats['first_attempt_date']:
-            st.metric(
-                "Première tentative",
-                format_date_fr(stats['first_attempt_date']),
-                border=True
-            )
-        else:
-            st.metric("Première tentative", "—", border=True)
-
-    with col4:
-        if stats['last_attempt_date']:
-            st.metric(
-                "Dernière tentative",
-                format_date_fr(stats['last_attempt_date']),
-                border=True
-            )
-        else:
-            st.metric("Dernière tentative", "—", border=True)
-    
+    if stats['total'] > 0:
+        st.space(size="small")
+        st.markdown(f"##### {stats['total']} tentatives ({stats['success_rate']:.0f}% de réussite)")
 
 
 # ===== HISTORIQUE DES TENTATIVES =====
 st.divider()
-
-st.markdown("### 🎯 Historique des tentatives")
+st.markdown("### Historique des tentatives")
 
 if route_attempts:
     # Trier par date (plus récentes en haut)

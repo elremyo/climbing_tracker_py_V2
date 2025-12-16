@@ -5,7 +5,7 @@ from services.filter_service import FilterService
 from components.filters import FilterComponents
 from components.forms import AttemptForm
 from components.cards import AttemptCard
-from components.dialogs import edit_attempt_dialog
+from components.dialogs import add_attempt_dialog,edit_attempt_dialog
 
 st.set_page_config(
     page_title="Tentatives"
@@ -35,27 +35,15 @@ filtered_attempts = FilterService.filter_attempts(attempts, routes)
 # Header
 st.subheader(f"Mes tentatives ({len(filtered_attempts)}/{len(attempts)})")
 
-# Bouton ajouter
-if st.button("Ajouter une tentative", key="add_attempt_button",  icon=":material/add:", use_container_width=True,type="primary"):
-    st.session_state.show_attempt_form = True
-
-# Formulaire d'ajout
-if st.session_state.show_attempt_form:
+if st.button("Ajouter une tentative", key="add_attempt_button", icon=":material/add:", use_container_width=True, type="primary"):
     if not routes:
         st.warning("Ajoute d'abord une voie avant d'enregistrer une tentative.")
     else:
-        def handle_submit(route_id, success, notes, attempt_date):
+        def save_handler(route_id, success, notes, attempt_date):
             add_attempt(route_id, success, notes, attempt_date)
-            st.session_state.show_attempt_success = True
-            st.session_state.show_attempt_form = False
-            st.rerun()
+            st.session_state.show_attempt_add_success = True
         
-        def handle_cancel():
-            st.session_state.show_attempt_form = False
-            st.rerun()
-        
-        AttemptForm.render(routes=routes, on_submit=handle_submit, on_cancel=handle_cancel)
-
+        add_attempt_dialog(routes, save_handler)
 
 # Filtres rapides
 FilterComponents.status_filter()
@@ -90,7 +78,7 @@ if filtered_attempts:
             def handler():
                 def save_handler(route_id, success, notes, attempt_date):
                     update_attempt(attempt["id"], route_id, success, notes, attempt_date)
-                    st.toast("Tentative modifiée !", icon="✅")
+                    st.session_state.show_attempt_edit_success = True
                 edit_attempt_dialog(attempt, routes, save_handler)
             return handler
         
@@ -108,7 +96,7 @@ if filtered_attempts:
                 # Callback de confirmation
                 def on_confirm():
                     delete_attempt(attempt["id"])
-                    st.toast("Tentative supprimée !", icon="✅")
+                    st.session_state.show_attempt_delete_success = True
                 
                 confirm_archive_dialog(display_name, on_confirm)
             return handler
@@ -126,6 +114,14 @@ else:
         st.info("Aucune tentative enregistrée.")
 
 # Message de succès
-if st.session_state.show_attempt_success:
+if st.session_state.show_attempt_add_success:
     st.toast("Tentative enregistrée !", icon="✅")
-    st.session_state.show_attempt_success = False
+    st.session_state.show_attempt_add_success = False
+
+if st.session_state.show_attempt_edit_success:
+    st.toast("Tentative modifiée !", icon="✅")
+    st.session_state.show_attempt_edit_success = False
+
+if st.session_state.show_attempt_delete_success:
+    st.toast("Tentative supprimée !", icon="✅")
+    st.session_state.show_attempt_delete_success = False

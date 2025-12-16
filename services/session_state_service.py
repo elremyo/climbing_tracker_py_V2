@@ -11,9 +11,10 @@ class SessionStateService:
     def init_routes_state():
         """Initialize routes page state"""
         defaults = {
-            "show_form": False,
             "show_add_success": False,
             "show_edit_success": False,
+            "show_archive_success": False,
+            "show_unarchive_success": False,
             "show_delete_success": False,
             "filter_colors": [],
             "show_archived": True,
@@ -28,8 +29,9 @@ class SessionStateService:
     def init_attempts_state():
         """Initialize attempts page state"""
         defaults = {
-            "show_attempt_form": False,
-            "show_attempt_success": False,
+            "show_attempt_add_success": False,
+            "show_attempt_edit_success": False,
+            "show_attempt_delete_success": False,
             "filter_period": "Tout",
             "filter_status": "Toutes",
             "filter_routes": [],

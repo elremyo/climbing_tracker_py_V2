@@ -5,7 +5,7 @@ from services.filter_service import FilterService
 from components.filters import FilterComponents
 from components.forms import RouteForm
 from components.cards import RouteCard
-from components.dialogs import edit_route_dialog
+from components.dialogs import add_route_dialog,edit_route_dialog
 
 st.set_page_config(
     page_title="Voies"
@@ -21,23 +21,13 @@ filtered_routes = FilterService.filter_routes(routes)
 # Header
 st.subheader(f"Mes voies ({len(filtered_routes)}/{len(routes)})")
 
-# Bouton ajouter
-if st.button("Ajouter une voie", icon=":material/add:", use_container_width=True,type="primary"):
-    st.session_state.show_form = True
-
-# Formulaire d'ajout
-if st.session_state.show_form:
-    def handle_submit(name, grade, color, type):
+# Boutton d'ajout
+if st.button("Ajouter une voie", icon=":material/add:", use_container_width=True, type="primary"):
+    def save_handler(name, grade, color, type):
         add_route(name, grade, color, type)
-        st.session_state.show_add_success = True
-        st.session_state.show_form = False
-        st.rerun()
-    
-    def handle_cancel():
-        st.session_state.show_form = False
-        st.rerun()
-    
-    RouteForm.render(on_submit=handle_submit, on_cancel=handle_cancel)
+        st.session_state.show_add_success = True    
+    add_route_dialog(save_handler)
+
 
 # Filtres
 with st.expander("Filtres"):
@@ -82,7 +72,7 @@ if filtered_routes:
                 # Callback de confirmation
                 def on_confirm():
                     archive_route(r["id"])
-                    st.toast("Voie archivée !", icon="✅")
+                    st.session_state.show_archive_success = True
                 
                 confirm_archive_dialog(f"{r['grade']} {r['name']}", on_confirm)
             return handler
@@ -90,7 +80,7 @@ if filtered_routes:
         def make_unarchive_handler(r):
             def handler():
                 unarchive_route(r["id"])
-                st.toast("Voie réactivée !", icon="✅")
+                st.session_state.show_unarchive_success = True
                 st.rerun()
             return handler
         
@@ -115,3 +105,11 @@ if st.session_state.show_add_success:
 if st.session_state.show_edit_success:
     st.toast("Voie modifiée !", icon="✅")
     st.session_state.show_edit_success = False
+
+if st.session_state.show_archive_success:
+    st.toast("Voie archivée !", icon="✅")
+    st.session_state.show_archive_success = False
+
+if st.session_state.show_unarchive_success:
+    st.toast("Voie réactivée !", icon="✅")
+    st.session_state.show_unarchive_success = False

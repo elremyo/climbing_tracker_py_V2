@@ -4,14 +4,13 @@ Modales d'édition.
 import streamlit as st
 from components.forms import RouteForm, AttemptForm
 
-@st.dialog("Éditer la voie")
-def edit_route_dialog(route, on_save):
+@st.dialog("Créer une voie")
+def add_route_dialog(on_save):
     """
-    Modal d'édition de voie.
+    Modal de création de voie.
     
     Args:
-        route: dict de la voie à éditer
-        on_save: callback(name, grade, color) appelé lors de la sauvegarde
+        on_save: callback(name, grade, color, type) appelé lors de la sauvegarde
     """
     def handle_submit(name, grade, color,type):
         on_save(name, grade, color,type)
@@ -20,7 +19,45 @@ def edit_route_dialog(route, on_save):
     def handle_cancel():
         st.rerun()
 
+    RouteForm.render(on_submit=handle_submit, on_cancel=handle_cancel)
+
+
+@st.dialog("Éditer la voie")
+def edit_route_dialog(route, on_save):
+    """
+    Modal d'édition de voie.
+    
+    Args:
+        route: dict de la voie à éditer
+        on_save: callback(name, grade, color, type) appelé lors de la sauvegarde
+    """
+    def handle_submit(name, grade, color, type):
+        on_save(name, grade, color, type)
+        st.rerun()
+    
+    def handle_cancel():
+        st.rerun()
+
     RouteForm.render(route=route, on_submit=handle_submit, on_cancel=handle_cancel)
+
+
+@st.dialog("Ajouter une tentative")
+def add_attempt_dialog(routes, on_save):
+    """
+    Modal de création de tentative.
+    
+    Args:
+        routes: liste des voies disponibles
+        on_save: callback(route_id, success, notes, date) lors de la sauvegarde
+    """
+    def handle_submit(route_id, success, notes, attempt_date):
+        on_save(route_id, success, notes, attempt_date)
+        st.rerun()
+    
+    def handle_cancel():
+        st.rerun()
+
+    AttemptForm.render(routes=routes, on_submit=handle_submit, on_cancel=handle_cancel)
 
 
 @st.dialog("Éditer la tentative")

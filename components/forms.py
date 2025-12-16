@@ -33,7 +33,8 @@ class RouteForm:
                 "Couleur",
                 options=list(ROUTE_COLORS.keys()),
                 index=list(ROUTE_COLORS.keys()).index(route["color"]) if route and route["color"] in ROUTE_COLORS else None,
-                format_func=lambda c: f"{ROUTE_COLORS[c]} {c}"
+                format_func=lambda c: f"{ROUTE_COLORS[c]} {c}",
+                placeholder="Sélectionne une couleur"
             )
 
 
@@ -46,7 +47,8 @@ class RouteForm:
                 "Type (optionnel)",
                 options=type_options,
                 index=default_index,
-                help=f"{' | '.join([f'**{k}**: {v}' for k,v in ROUTE_TYPES.items()])}"
+                help=f"{' | '.join([f'**{k}**: {v}' for k,v in ROUTE_TYPES.items()])}",
+                placeholder="Sélectionne un type de voie"
             )
 
             submitted = st.form_submit_button("Enregistrer", use_container_width=True,type="primary")

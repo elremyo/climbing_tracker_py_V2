@@ -3,6 +3,10 @@ from data import get_routes, get_attempts
 from services.stats_service import StatsService
 from utils.formatting import format_date_fr
 
+st.set_page_config(
+    page_title="Dashboard"
+)
+
 st.subheader("Tableau de bord")
 
 routes = get_routes()

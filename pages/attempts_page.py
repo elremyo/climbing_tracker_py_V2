@@ -7,6 +7,10 @@ from components.forms import AttemptForm
 from components.cards import AttemptCard
 from components.dialogs import edit_attempt_dialog
 
+st.set_page_config(
+    page_title="Tentatives"
+)
+
 # Style CSS
 st.markdown("""
     <style>

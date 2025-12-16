@@ -7,6 +7,9 @@ from components.forms import RouteForm
 from components.cards import RouteCard
 from components.dialogs import edit_route_dialog
 
+st.set_page_config(
+    page_title="Voies"
+)
 
 # Initialisation
 SessionStateService.init_routes_state()

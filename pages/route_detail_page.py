@@ -6,6 +6,7 @@ from utils.constants import ROUTE_COLORS, ROUTE_TYPES
 from utils.formatting import format_date_fr
 
 
+
 # Récupération du route_id depuis les query params
 query_params = st.query_params
 route_id = st.query_params.get("route_id", None) 
@@ -27,6 +28,10 @@ if not route:
     if st.button("← Retour aux voies"):
         st.switch_page("pages/routes_page.py")
     st.stop()
+
+st.set_page_config(
+    page_title=f"Détail : {route['name']}"
+)
 
 # Récupérer toutes les tentatives de cette voie
 attempts = get_attempts()

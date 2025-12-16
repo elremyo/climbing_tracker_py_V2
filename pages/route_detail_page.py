@@ -1,5 +1,6 @@
 import streamlit as st
-from data import get_routes, get_attempts
+from data import get_routes, get_attempts, add_attempt, update_attempt, delete_attempt
+from components.dialogs import add_attempt_dialog, edit_attempt_dialog, confirm_archive_dialog
 from services.route_stats_service import RouteStatsService
 from components.cards import AttemptCard
 from utils.constants import ROUTE_COLORS, ROUTE_TYPES
@@ -67,6 +68,15 @@ if route_attempts:
 st.divider()
 st.markdown("### Historique des tentatives")
 
+#Bouton d'ajout
+if st.button("Ajouter une tentative", icon=":material/add:", type="primary"):
+    def save_handler(route_id, success, notes, attempt_date):
+        add_attempt(route_id, success, notes, attempt_date)
+        st.session_state.show_attempt_add_success = True
+    
+    add_attempt_dialog([route], save_handler, fixed_route=route)
+
+#Liste des tentatives
 if route_attempts:
     # Trier par date (plus récentes en haut)
     sorted_attempts = RouteStatsService.get_progression_timeline(route_attempts)
@@ -74,21 +84,17 @@ if route_attempts:
     for attempt in sorted_attempts:
         def make_edit_handler(a):
             def handler():
-                from components.dialogs import edit_attempt_dialog
                 def save_handler(route_id, success, notes, attempt_date):
-                    from data import update_attempt
                     update_attempt(a["id"], route_id, success, notes, attempt_date)
-                    st.toast("Tentative modifiée !", icon="✅")
+                    st.session_state.show_attempt_edit_success = True
                 edit_attempt_dialog(a, [route], save_handler)
             return handler
 
         def make_delete_handler(a):
             def handler():
-                from components.dialogs import confirm_archive_dialog
-                from data import delete_attempt
                 def on_confirm():
                     delete_attempt(a["id"])
-                    st.toast("Tentative supprimée !", icon="✅")
+                    st.session_state.show_attempt_delete_success = True
                 confirm_archive_dialog(f"tentative du {format_date_fr(a['date'])}", on_confirm)
             return handler
 
@@ -103,5 +109,15 @@ if route_attempts:
 else:
     st.info("Aucune tentative enregistrée pour cette voie.")
 
-if st.button("Ajouter une tentative", icon=":material/add:", type="primary"):
-    st.switch_page("pages/attempts_page.py")
+# Message de succès
+if st.session_state.show_attempt_add_success:
+    st.toast("Tentative enregistrée !", icon="✅")
+    st.session_state.show_attempt_add_success = False
+
+if st.session_state.show_attempt_edit_success:
+    st.toast("Tentative modifiée !", icon="✅")
+    st.session_state.show_attempt_edit_success = False
+
+if st.session_state.show_attempt_delete_success:
+    st.toast("Tentative supprimée !", icon="✅")
+    st.session_state.show_attempt_delete_success = False

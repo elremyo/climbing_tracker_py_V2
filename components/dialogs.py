@@ -4,16 +4,16 @@ Modales d'édition.
 import streamlit as st
 from components.forms import RouteForm, AttemptForm
 
-@st.dialog("Créer une voie")
+@st.dialog("Ajouter une voie")
 def add_route_dialog(on_save):
     """
-    Modal de création de voie.
+    Modal d'ajout de voie.
     
     Args:
         on_save: callback(name, grade, color, type) appelé lors de la sauvegarde
     """
-    def handle_submit(name, grade, color,type):
-        on_save(name, grade, color,type)
+    def handle_submit(name, grade, color, type):
+        on_save(name, grade, color, type)
         st.rerun()
     
     def handle_cancel():
@@ -42,13 +42,14 @@ def edit_route_dialog(route, on_save):
 
 
 @st.dialog("Ajouter une tentative")
-def add_attempt_dialog(routes, on_save):
+def add_attempt_dialog(routes, on_save, fixed_route=None):
     """
-    Modal de création de tentative.
+    Modal d'ajout de tentative.
     
     Args:
         routes: liste des voies disponibles
-        on_save: callback(route_id, success, notes, date) lors de la sauvegarde
+        on_save: callback(route_id, success, notes, date) appelé lors de la sauvegarde
+        fixed_route: dict de la voie fixe (si on ajoute depuis la page détail)
     """
     def handle_submit(route_id, success, notes, attempt_date):
         on_save(route_id, success, notes, attempt_date)
@@ -57,7 +58,7 @@ def add_attempt_dialog(routes, on_save):
     def handle_cancel():
         st.rerun()
 
-    AttemptForm.render(routes=routes, on_submit=handle_submit, on_cancel=handle_cancel)
+    AttemptForm.render(routes=routes, on_submit=handle_submit, on_cancel=handle_cancel, fixed_route=fixed_route)
 
 
 @st.dialog("Éditer la tentative")
@@ -96,4 +97,3 @@ def confirm_archive_dialog(item_name, on_confirm):
 
     if st.button("Annuler", use_container_width=True, type="secondary"):
         st.rerun()
-    

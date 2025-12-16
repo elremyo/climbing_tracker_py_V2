@@ -15,7 +15,7 @@ class RouteForm:
         
         Args:
             route: dict de la voie à éditer (None pour création)
-            on_submit: callback(name, grade, color) appelé lors de la soumission
+            on_submit: callback(name, grade, color, type) appelé lors de la soumission
             on_cancel: callback() appelé lors de l'annulation
         """
         form_key = "edit_route_form" if route else "add_route_form"
@@ -77,7 +77,7 @@ class AttemptForm:
     """Formulaire de tentative (add ou edit)"""
     
     @staticmethod
-    def render(routes, attempt=None, on_submit=None, on_cancel=None):
+    def render(routes, attempt=None, on_submit=None, on_cancel=None, fixed_route=None):
         """
         Affiche un formulaire de tentative.
         
@@ -86,28 +86,36 @@ class AttemptForm:
             attempt: dict de la tentative à éditer (None pour création)
             on_submit: callback(route_id, success, notes, attempt_date)
             on_cancel: callback() appelé lors de l'annulation
+            fixed_route: dict de la voie fixe (non modifiable)
         """
         form_key = "edit_attempt_form" if attempt else "add_attempt_form"
         
         with st.form(form_key):
-            # Sélecteur de voie
-            route_mapping = {f"{r['name']} ({r['grade']})": r["id"] for r in routes}
-            
-            if attempt:
-                selected_route = next((k for k, v in route_mapping.items() if v == attempt['route_id']), "")
-                if not selected_route:
-                    st.warning("⚠️ La voie associée à cette tentative a été supprimée.")
-                    selected_route = st.selectbox("Voie", [""] + list(route_mapping.keys()))
-                else:
-                    selected_route = st.selectbox(
-                        "Voie",
-                        [""] + list(route_mapping.keys()),
-                        index=list(route_mapping.keys()).index(selected_route) + 1
-                    )
+            # Sélecteur de voie OU affichage fixe
+            if fixed_route:
+                # Mode voie fixe : afficher les infos sans sélecteur
+                color_emoji = ROUTE_COLORS.get(fixed_route["color"], "❓")
+                st.markdown(f"**Voie :** {color_emoji} {fixed_route['grade']} - {fixed_route['name']}")
+                route_id = fixed_route["id"]
             else:
-                selected_route = st.selectbox("Voie", [""] + list(route_mapping.keys()))
-            
-            route_id = route_mapping.get(selected_route, None)
+                # Mode normal : sélecteur de voie
+                route_mapping = {f"{r['name']} ({r['grade']})": r["id"] for r in routes}
+                
+                if attempt:
+                    selected_route = next((k for k, v in route_mapping.items() if v == attempt['route_id']), "")
+                    if not selected_route:
+                        st.warning("⚠️ La voie associée à cette tentative a été supprimée.")
+                        selected_route = st.selectbox("Voie", [""] + list(route_mapping.keys()))
+                    else:
+                        selected_route = st.selectbox(
+                            "Voie",
+                            [""] + list(route_mapping.keys()),
+                            index=list(route_mapping.keys()).index(selected_route) + 1
+                        )
+                else:
+                    selected_route = st.selectbox("Voie", [""] + list(route_mapping.keys()))
+                
+                route_id = route_mapping.get(selected_route, None)
             
             # Date
             if attempt:
@@ -134,10 +142,11 @@ class AttemptForm:
             
             if submitted:
                 errors = []
-                if not selected_route or selected_route == "":
-                    errors.append("Sélectionne une voie.")
-                elif route_id is None:
-                    errors.append("Erreur : voie invalide sélectionnée.")
+                if not fixed_route:  # Seulement vérifier si pas en mode voie fixe
+                    if not selected_route or selected_route == "":
+                        errors.append("Sélectionne une voie.")
+                    elif route_id is None:
+                        errors.append("Erreur : voie invalide sélectionnée.")
                 if not attempt_date:
                     errors.append("Sélectionne une date.")
                 

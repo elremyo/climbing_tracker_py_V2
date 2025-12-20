@@ -20,7 +20,7 @@ st.header("⛰️ Climbing tracker", anchor=False, divider="orange", text_alignm
 
 # définition des pages
 pages = [
-    st.Page("pages/login_page.py", title="Connexion", icon="🔐"),
+    st.Page("pages/login_page.py", title="Connexion", icon=":material/account_box:"),
     st.Page("pages/dashboard_page.py", title="Tableau de bord", icon="📊"),
     st.Page("pages/routes_page.py", title="Voies", icon="🧗"),
     st.Page("pages/attempts_page.py", title="Tentatives", icon="🎯"),

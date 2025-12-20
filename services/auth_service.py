@@ -3,10 +3,11 @@ Service d'authentification avec Supabase Auth.
 """
 import streamlit as st
 from data.supabase_client import supabase
+from services.user_context import UserContext
 
 class AuthService:
     """Gestion de l'authentification utilisateur"""
-       
+    
     @staticmethod
     def sign_up(email, password):
         """
@@ -70,7 +71,7 @@ class AuthService:
         Returns:
             User object ou None
         """
-        return st.session_state.get("user", None)
+        return UserContext.get_user()
     
     @staticmethod
     def get_user_id():
@@ -80,13 +81,12 @@ class AuthService:
         Returns:
             str: user_id ou None
         """
-        user = AuthService.get_current_user()
-        return user.id if user else None
+        return UserContext.get_user_id()
     
     @staticmethod
     def is_authenticated():
         """Vérifie si un utilisateur est connecté"""
-        return st.session_state.get("user") is not None
+        return UserContext.is_authenticated()
     
     @staticmethod
     def require_auth():

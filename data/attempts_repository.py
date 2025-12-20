@@ -1,11 +1,11 @@
 from data.supabase_client import supabase
-from services.auth_service import AuthService
+from services.user_context import UserContext
 
 def get_attempts():
     """
     Récupère toutes les tentatives de l'utilisateur connecté, triées par date décroissante.
     """
-    user_id = AuthService.get_user_id()
+    user_id = UserContext.get_user_id()
     if not user_id:
         return []
     
@@ -22,7 +22,7 @@ def get_attempts():
 
 def add_attempt(route_id, success, notes="", attempt_date=None):
     """Ajoute une tentative pour l'utilisateur connecté"""
-    user_id = AuthService.get_user_id()
+    user_id = UserContext.get_user_id()
     if not user_id:
         raise Exception("Utilisateur non connecté")
     

@@ -7,6 +7,7 @@ ROUTE_COLORS = {
     "Violette": "💜",
     "Rose": "🩷",
     "Blanche": "🤍",
+    "Grise": "🩶",
     "Noire": "🖤"
 }
 

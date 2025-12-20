@@ -1,5 +1,6 @@
 import streamlit as st
 from services.auth_service import AuthService
+from streamlit_extras.skeleton import skeleton
 
 # ----------------------
 # Sidebar navigation customisée
@@ -29,8 +30,14 @@ def display_sidebar_menu():
             st.sidebar.page_link("pages/login_page.py", label="Se connecter", icon="🔐")
 
 def display_top_menu():
-    # Show a top navigation menu
-    with st.container(horizontal=True):
-        st.page_link("pages/dashboard_page.py", label="", icon="📊")
-        st.page_link("pages/routes_page.py", label="", icon="🧗")
-        st.page_link("pages/attempts_page.py", label="", icon="🎯")
+    if not st.runtime.exists():
+        skeleton()
+        return
+
+    try:
+        with st.container(horizontal=True):
+            st.page_link("pages/dashboard_page.py", label="", icon="📊")
+            st.page_link("pages/routes_page.py", label="", icon="🧗")
+            st.page_link("pages/attempts_page.py", label="", icon="🎯")
+    except KeyError:
+        skeleton()

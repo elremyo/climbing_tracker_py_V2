@@ -3,7 +3,6 @@ from data import get_routes, get_attempts, add_attempt, update_attempt, delete_a
 from services.session_state_service import SessionStateService
 from services.filter_service import FilterService
 from components.filters import FilterComponents
-from components.forms import AttemptForm
 from components.cards import AttemptCard
 from components.dialogs import add_attempt_dialog,edit_attempt_dialog
 from services.auth_service import AuthService

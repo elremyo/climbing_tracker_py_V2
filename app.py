@@ -27,7 +27,7 @@ pages = [
 ]
 
 # Navigation
-current = st.navigation(pages, position="hidden")
+current = st.navigation(pages, position="top")
 
 # Menu conditionnel selon l'état de connexion
 if AuthService.is_authenticated():

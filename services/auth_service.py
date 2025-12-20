@@ -46,6 +46,7 @@ class AuthService:
             if response.user and response.session:
                 st.session_state.user = response.user
                 st.session_state.session = response.session
+                supabase.auth.set_session(response.session.access_token,response.session.refresh_token)
                 return True, "✅ Connexion réussie !"
             else:
                 return False, "❌ Email ou mot de passe incorrect."
@@ -110,6 +111,7 @@ class AuthService:
                 response = supabase.auth.get_user(session.access_token)
                 if response.user:
                     st.session_state.user = response.user
+                    supabase.auth.set_session(session.access_token,session.refresh_token)
                     return True
             return False
         except Exception:

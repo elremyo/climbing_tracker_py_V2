@@ -31,3 +31,6 @@ class UserContext:
     def is_authenticated():
         """Vérifie si un utilisateur est connecté"""
         return st.session_state.get("user") is not None
+    
+
+    

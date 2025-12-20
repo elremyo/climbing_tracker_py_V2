@@ -57,7 +57,7 @@ if filtered_routes:
         def make_click_handler(r):
             def handler():
                 st.query_params.from_dict({"route_id": str(r["id"])})
-                st.switch_page("pages/route_detail_page.py",query_params={"route_id": str(r["id"])})
+                st.switch_page("pages/route_detail_page.py", query_params={"route_id": str(r["id"])})
             return handler
 
         def make_edit_handler(r):

@@ -1,6 +1,7 @@
 import streamlit as st
 from services.auth_service import AuthService
 from services.session_state_service import SessionStateService
+from components.side_bar_menu import display_sidebar_menu, display_top_menu
 
 # ----------------------
 # Config de base
@@ -22,46 +23,18 @@ st.header("⛰️ Climbing tracker", anchor=False, divider="orange", text_alignm
 # ----------------------
 # Définition des pages
 # ----------------------
-# route_detail_page est volontairement exclue du menu
 pages = [
     st.Page("pages/login_page.py", title="Connexion", icon="🔐"),
     st.Page("pages/dashboard_page.py", title="Tableau de bord", icon="📊", default=True),
     st.Page("pages/routes_page.py", title="Voies", icon="🧗"),
     st.Page("pages/attempts_page.py", title="Tentatives", icon="🎯"),
-    st.Page("pages/route_detail_page.py", title="Détail voie", icon="🔍")  # reste accessible via switch_page
+    st.Page("pages/route_detail_page.py", title="Détail voie", icon="🔍")
 ]
+# Afficher le top menu personnalisé
+display_top_menu()
 
-
-# ----------------------
-# Navigation top (optionnelle)
-# ----------------------
-current = st.navigation(pages, position="sidebar")  # Permet à st.switch_page de fonctionner
+current = st.navigation(pages, position="hidden")  # Permet à st.switch_page de fonctionner
 current.run()
 
-# ----------------------
-# Navigation sidebar
-# ----------------------
-with st.sidebar:
-    if AuthService.is_authenticated():
-        # Liens vers les pages visibles
-        st.page_link("pages/dashboard_page.py", label="Dashboard", icon="📊")
-        st.page_link("pages/routes_page.py", label="Voies", icon="🧗")
-        st.page_link("pages/attempts_page.py", label="Tentatives", icon="🎯")
-        
-        # Popover profil + déconnexion
-        user = AuthService.get_current_user()
-        user_email = user.email if user else "Utilisateur"
-        with st.expander(f"👤 Mon compte", expanded=False):
-            st.markdown(f"**Connecté en tant que :**  \n{user_email}")
-            if st.button("Se déconnecter", use_container_width=True, type="secondary"):
-                success, message = AuthService.sign_out()
-                if success:
-                    st.switch_page("pages/login_page.py")
-    else:
-        # Si non connecté, afficher juste un lien vers login
-        st.page_link("pages/login_page.py", label="Se connecter", icon="🔐")
-
-with st.container(horizontal=True):
-    st.page_link("pages/dashboard_page.py", label="", icon="📊")
-    st.page_link("pages/routes_page.py", label="", icon="🧗")
-    st.page_link("pages/attempts_page.py", label="", icon="🎯")
+# Afficher le menu latéral personnalisé
+display_sidebar_menu()

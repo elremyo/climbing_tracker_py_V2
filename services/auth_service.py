@@ -55,7 +55,11 @@ class AuthService:
     
     @staticmethod
     def sign_out():
-        """Déconnexion de l'utilisateur"""
+        """Déconnexion de l'utilisateur.
+        
+        Returns:
+            tuple: (success: bool, message: str)
+        """
         try:
             supabase.auth.sign_out()
             st.session_state.user = None

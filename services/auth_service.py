@@ -94,10 +94,9 @@ class AuthService:
         Vérifie l'authentification et redirige vers login si nécessaire.
         À utiliser au début de chaque page protégée.
         """
-        if not AuthService.is_authenticated():
-            st.warning("🔒 Tu dois te connecter pour accéder à cette page.")
+        if not UserContext.is_authenticated():
             st.switch_page("pages/login_page.py")
-            st.stop()
+            st.stop()  # Empêche l'exécution du reste de la page
     
     @staticmethod
     def check_session():

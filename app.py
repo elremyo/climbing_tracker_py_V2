@@ -2,7 +2,6 @@ import streamlit as st
 from services.auth_service import AuthService
 from services.session_state_service import SessionStateService
 
-
 # config de base
 st.set_page_config(
     page_title="Climbing Tracker",
@@ -18,19 +17,20 @@ AuthService.check_session()
 
 st.header("⛰️ Climbing tracker", anchor=False, divider="orange", text_alignment="center", width="content")
 
-# définition des pages
+# Définition de toutes les pages (toujours disponibles)
 pages = [
-    st.Page("pages/login_page.py", title="Connexion", icon=":material/account_box:"),
+    st.Page("pages/login_page.py", title="Connexion", icon="🔐"),
     st.Page("pages/dashboard_page.py", title="Tableau de bord", icon="📊"),
     st.Page("pages/routes_page.py", title="Voies", icon="🧗"),
     st.Page("pages/attempts_page.py", title="Tentatives", icon="🎯"),
     st.Page("pages/route_detail_page.py", title="Détail voie", icon="🔍")
 ]
 
-# Navigation conditionnelle selon l'état de connexion
+# Navigation
+current = st.navigation(pages, position="hidden")
+
+# Menu conditionnel selon l'état de connexion
 if AuthService.is_authenticated():
-    current = st.navigation(pages, position="hidden")
-    
     with st.container(horizontal=True, gap="small", vertical_alignment="center"):
         st.page_link("pages/dashboard_page.py", label="Dashboard", icon="📊")
         st.page_link("pages/routes_page.py", label="Voies", icon="🧗")
@@ -45,9 +45,10 @@ if AuthService.is_authenticated():
             if st.button("Se déconnecter", use_container_width=True, type="secondary"):
                 success, message = AuthService.sign_out()
                 if success:
-                    st.rerun()
+                    st.switch_page("pages/login_page.py")
 else:
-    # Si non connecté, afficher seulement la page de login
-    current = st.navigation([pages[0]], position="hidden")
+    # Si non connecté, afficher juste un lien vers login
+    with st.container(horizontal=True, gap="small", vertical_alignment="center"):
+        st.page_link("pages/login_page.py", label="Se connecter", icon="🔐")
 
 current.run()

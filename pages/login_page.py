@@ -13,7 +13,7 @@ st.subheader("🔐 Connexion")
 # Si déjà connecté, rediriger
 if AuthService.is_authenticated():
     st.success("✅ Tu es déjà connecté !")
-    if st.button("Aller au tableau de bord", use_container_width=True):
+    if st.button("Aller au tableau de bord", use_container_width=True, type="primary"):
         st.switch_page("pages/dashboard_page.py")
     st.stop()
 
@@ -35,7 +35,7 @@ with tab1:
                 success, message = AuthService.sign_in(email, password)
                 if success:
                     st.success(message)
-                    st.rerun()
+                    st.switch_page("pages/dashboard_page.py")
                 else:
                     st.error(message)
 

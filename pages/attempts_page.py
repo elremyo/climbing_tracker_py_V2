@@ -6,6 +6,10 @@ from components.filters import FilterComponents
 from components.forms import AttemptForm
 from components.cards import AttemptCard
 from components.dialogs import add_attempt_dialog,edit_attempt_dialog
+from services.auth_service import AuthService
+
+# Protection : rediriger vers login si non connecté
+AuthService.require_auth()
 
 st.set_page_config(
     page_title="Tentatives"

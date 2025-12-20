@@ -6,6 +6,10 @@ from components.filters import FilterComponents
 from components.forms import RouteForm
 from components.cards import RouteCard
 from components.dialogs import add_route_dialog,edit_route_dialog
+from services.auth_service import AuthService
+
+# Protection : rediriger vers login si non connecté
+AuthService.require_auth()
 
 st.set_page_config(
     page_title="Voies"

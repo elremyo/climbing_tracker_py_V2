@@ -1,5 +1,5 @@
 """
-Gestion centralisée du session_state pour éviter la duplication.
+Gestion centralisée du session_state.
 """
 import streamlit as st
 from utils.constants import GRADES
@@ -7,6 +7,18 @@ from utils.constants import GRADES
 class SessionStateService:
     """Service de gestion du session_state"""
     
+    @staticmethod
+    def init_app_state():
+        """Initialize global app state (auth, etc.)"""
+        defaults = {
+            "user": None,
+            "session": None,
+        }
+        for key, value in defaults.items():
+            if key not in st.session_state:
+                st.session_state[key] = value
+
+
     @staticmethod
     def init_routes_state():
         """Initialize routes page state"""

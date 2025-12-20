@@ -1,7 +1,6 @@
 """
 Calculs de statistiques pour une voie spécifique.
 """
-from datetime import datetime
 
 class RouteStatsService:
     """Service de calcul des stats d'une voie"""

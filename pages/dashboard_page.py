@@ -2,6 +2,10 @@ import streamlit as st
 from data import get_routes, get_attempts
 from services.stats_service import StatsService
 from utils.formatting import format_date_fr
+from services.auth_service import AuthService
+
+# Protection : rediriger vers login si non connecté
+AuthService.require_auth()
 
 st.set_page_config(
     page_title="Dashboard"

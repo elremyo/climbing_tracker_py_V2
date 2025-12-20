@@ -5,6 +5,10 @@ from services.route_stats_service import RouteStatsService
 from components.cards import AttemptCard
 from utils.constants import ROUTE_COLORS, ROUTE_TYPES
 from utils.formatting import format_date_fr
+from services.auth_service import AuthService
+
+# Protection : rediriger vers login si non connecté
+AuthService.require_auth()
 
 
 

@@ -25,11 +25,18 @@ st.header("⛰️ Climbing tracker", anchor=False, divider="orange", text_alignm
 # route_detail_page est volontairement exclue du menu
 pages = [
     st.Page("pages/login_page.py", title="Connexion", icon="🔐"),
-    st.Page("pages/dashboard_page.py", title="Tableau de bord", icon="📊"),
+    st.Page("pages/dashboard_page.py", title="Tableau de bord", icon="📊", default=True),
     st.Page("pages/routes_page.py", title="Voies", icon="🧗"),
     st.Page("pages/attempts_page.py", title="Tentatives", icon="🎯"),
     st.Page("pages/route_detail_page.py", title="Détail voie", icon="🔍")  # reste accessible via switch_page
 ]
+
+
+# ----------------------
+# Navigation top (optionnelle)
+# ----------------------
+current = st.navigation(pages, position="sidebar")  # Permet à st.switch_page de fonctionner
+current.run()
 
 # ----------------------
 # Navigation sidebar
@@ -58,9 +65,3 @@ with st.container(horizontal=True):
     st.page_link("pages/dashboard_page.py", label="", icon="📊")
     st.page_link("pages/routes_page.py", label="", icon="🧗")
     st.page_link("pages/attempts_page.py", label="", icon="🎯")
-
-# ----------------------
-# Navigation top (optionnelle)
-# ----------------------
-current = st.navigation(pages, position="sidebar")  # Permet à st.switch_page de fonctionner
-current.run()

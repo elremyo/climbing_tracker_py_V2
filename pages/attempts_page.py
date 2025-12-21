@@ -54,7 +54,6 @@ FilterComponents.status_filter()
 # Filtres avancés
 with st.expander("Filtres avancés"):
     FilterComponents.period_filter()
-    FilterComponents.routes_multiselect(routes)
     
     sort_option = st.radio(
         "Trier par",

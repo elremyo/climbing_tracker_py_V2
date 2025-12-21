@@ -52,10 +52,6 @@ class FilterService:
         elif st.session_state.filter_status == "Échouées":
             filtered = [a for a in filtered if not a.get("success")]
         
-        # Filtre par voies
-        if st.session_state.filter_routes:
-            filtered = [a for a in filtered if a["route_id"] in st.session_state.filter_routes]
-        
         # Tri
         if st.session_state.sort_order == "Plus récent":
             filtered = sorted(filtered, key=lambda a: a["date"], reverse=True)

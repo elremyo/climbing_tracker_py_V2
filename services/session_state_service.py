@@ -62,5 +62,4 @@ class SessionStateService:
         """Reset all attempts filters"""
         st.session_state.filter_period = "Tout"
         st.session_state.filter_status = "Toutes"
-        st.session_state.filter_routes = []
         st.session_state.sort_order = "Plus récent"

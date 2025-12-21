@@ -74,22 +74,7 @@ class FilterComponents:
         if new_status != st.session_state.filter_status:
             st.session_state.filter_status = new_status
             st.rerun()
-    
-    @staticmethod
-    def routes_multiselect(routes):
-        """Multiselect pour filtrer par voies"""
-        if not routes:
-            return
-        
-        route_options = {f"{r['name']} ({r['grade']})": r["id"] for r in routes}
-        selected_routes = st.multiselect(
-            "Filtrer par voies",
-            options=list(route_options.keys()),
-            default=[k for k, v in route_options.items() if v in st.session_state.filter_routes],
-            placeholder="Sélectionne une ou plusieurs voies"
-        )
-        st.session_state.filter_routes = [route_options[r] for r in selected_routes]
-    
+       
     @staticmethod
     def colors_multiselect():
         """Multiselect pour filtrer par couleurs"""

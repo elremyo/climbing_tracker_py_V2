@@ -18,12 +18,3 @@ GRADES = [
     "7a", "7a+", "7b", "7b+", "7c", "7c+",
     "8a", "8a+", "8b", "8b+", "8c", "8c+"
 ]
-
-ROUTE_TYPES = {
-    "Verticale":"Paroi verticale",
-    "Dalle": "Paroi à inclinaison positive",
-    "Dévers":"Paroi à inclinaison négative",
-    "Toit":"Paroi horizontale",
-    "Cheminée":"Parois face à face",
-    "Dièdre":"Angle formé par deux parois",
-}

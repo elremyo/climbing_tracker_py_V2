@@ -26,8 +26,8 @@ st.subheader(f"Mes voies ({len(filtered_routes)}/{len(routes)})")
 
 # Boutton d'ajout
 if st.button("Ajouter une voie", icon=":material/add:", use_container_width=True, type="primary"):
-    def save_handler(name, grade, color, type):
-        add_route(name, grade, color, type)
+    def save_handler(name, grade, color):
+        add_route(name, grade, color)
         st.session_state.show_add_success = True    
     add_route_dialog(save_handler)
 
@@ -62,8 +62,8 @@ if filtered_routes:
 
         def make_edit_handler(r):
             def handler():
-                def save_handler(name, grade, color,type):
-                    update_route(r["id"], name=name, grade=grade, color=color, type=type)
+                def save_handler(name, grade, color):
+                    update_route(r["id"], name=name, grade=grade, color=color)
                     st.session_state.show_edit_success = True
                 edit_route_dialog(r, save_handler)
             return handler

@@ -3,7 +3,7 @@ from data import get_routes, get_attempts, add_attempt, update_attempt, delete_a
 from components.dialogs import add_attempt_dialog, edit_attempt_dialog, confirm_archive_dialog
 from services.route_stats_service import RouteStatsService
 from components.cards import AttemptCard
-from utils.constants import ROUTE_COLORS, ROUTE_TYPES
+from utils.constants import ROUTE_COLORS
 from utils.formatting import format_date_fr
 from services.auth_service import AuthService
 
@@ -53,10 +53,8 @@ with st.container(border=False, vertical_alignment="bottom", horizontal=True, ga
             st.switch_page("pages/routes_page.py")
 
     color_emoji = ROUTE_COLORS.get(route["color"], "❓")
-    route_type = route.get("type")
-    type_display = f" :violet-badge[{route_type}]" if route_type else ""
     archived_badge = " :red-badge[Archivée]" if route.get("archived") else ""
-    st.subheader(f"{color_emoji} {route['grade']} - {route['name']}{type_display}{archived_badge}")
+    st.subheader(f"{color_emoji} {route['grade']} - {route['name']}{archived_badge}")
 
 
 # ===== STATISTIQUES PRINCIPALES =====

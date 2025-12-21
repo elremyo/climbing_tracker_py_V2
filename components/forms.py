@@ -3,7 +3,7 @@ Formulaires réutilisables pour routes et attempts.
 """
 import streamlit as st
 from datetime import date
-from utils.constants import ROUTE_COLORS, GRADES, ROUTE_TYPES
+from utils.constants import ROUTE_COLORS, GRADES
 
 class RouteForm:
     """Formulaire de voie (add ou edit)"""
@@ -15,7 +15,7 @@ class RouteForm:
         
         Args:
             route: dict de la voie à éditer (None pour création)
-            on_submit: callback(name, grade, color, type) appelé lors de la soumission
+            on_submit: callback(name, grade, color) appelé lors de la soumission
             on_cancel: callback() appelé lors de l'annulation
         """
         form_key = "edit_route_form" if route else "add_route_form"
@@ -38,19 +38,6 @@ class RouteForm:
             )
 
 
-            type_options = [""] + list(ROUTE_TYPES.keys())
-            default_index = 0
-            if route and route.get("type") in ROUTE_TYPES:
-                default_index = type_options.index(route["type"])
-
-            type = st.selectbox(
-                "Type (optionnel)",
-                options=type_options,
-                index=default_index,
-                help=f"{' | '.join([f'**{k}**: {v}' for k,v in ROUTE_TYPES.items()])}",
-                placeholder="Sélectionne un type de voie"
-            )
-
             submitted = st.form_submit_button("Enregistrer", use_container_width=True,type="primary")
             cancel = st.form_submit_button("Annuler", use_container_width=True, type="secondary")
             
@@ -70,7 +57,7 @@ class RouteForm:
                     for err in errors:
                         st.error(err)
                 elif on_submit:
-                    on_submit(name, grade, color,type)
+                    on_submit(name, grade, color)
 
 
 class AttemptForm:

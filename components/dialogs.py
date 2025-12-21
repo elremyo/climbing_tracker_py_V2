@@ -10,10 +10,10 @@ def add_route_dialog(on_save):
     Modal d'ajout de voie.
     
     Args:
-        on_save: callback(name, grade, color, type) appelé lors de la sauvegarde
+        on_save: callback(name, grade, color) appelé lors de la sauvegarde
     """
-    def handle_submit(name, grade, color, type):
-        on_save(name, grade, color, type)
+    def handle_submit(name, grade, color):
+        on_save(name, grade, color)
         st.rerun()
     
     def handle_cancel():
@@ -29,10 +29,10 @@ def edit_route_dialog(route, on_save):
     
     Args:
         route: dict de la voie à éditer
-        on_save: callback(name, grade, color, type) appelé lors de la sauvegarde
+        on_save: callback(name, grade, color) appelé lors de la sauvegarde
     """
-    def handle_submit(name, grade, color, type):
-        on_save(name, grade, color, type)
+    def handle_submit(name, grade, color):
+        on_save(name, grade, color)
         st.rerun()
     
     def handle_cancel():

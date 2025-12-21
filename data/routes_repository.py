@@ -32,7 +32,7 @@ def get_active_routes():
     )
     return res.data if res.data else []
 
-def add_route(name, grade, color, type=None):
+def add_route(name, grade, color):
     """Ajoute une voie pour l'utilisateur connecté"""
     user_id = UserContext.get_user_id()
     if not user_id:
@@ -42,7 +42,6 @@ def add_route(name, grade, color, type=None):
         "name": name,
         "grade": grade,
         "color": color,
-        "type": type,
         "archived": False,
         "user_id": user_id
     }).execute()

@@ -22,10 +22,8 @@ class RouteCard:
         """
         color_emoji = ROUTE_COLORS.get(route["color"], "❓")
         archived = route.get("archived", False)
-        route_type = route.get("type")
-        type_badge = f" :violet-badge[{route_type}]" if route_type else ""
         
-        display = f"{color_emoji} **{route['grade']}** - :small[{route['name']}{type_badge}]"
+        display = f"{color_emoji} **{route['grade']}** - :small[{route['name']}]"
         if archived:
             display = f''':grey[{display + " - :material/lock: _Archivée_"}]''' 
 

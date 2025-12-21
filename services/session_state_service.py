@@ -29,7 +29,9 @@ class SessionStateService:
             "filter_colors": [],
             "filter_min_grade": GRADES[0],
             "filter_max_grade": GRADES[-1],
-            "filter_space":[]
+            "filter_space": [],
+            "sort_by": "Cotation",  # Options: "Cotation", "Relais", "Tentatives"
+            "sort_direction": "Décroissant"  # Options: "Croissant", "Décroissant"
         }
         for key, value in defaults.items():
             if key not in st.session_state:
@@ -58,6 +60,8 @@ class SessionStateService:
         st.session_state.filter_space = []
         st.session_state.filter_min_grade = GRADES[0]
         st.session_state.filter_max_grade = GRADES[-1]
+        st.session_state.sort_by = "Cotation"
+        st.session_state.sort_direction = "Décroissant"
     
     @staticmethod
     def reset_attempts_filters():

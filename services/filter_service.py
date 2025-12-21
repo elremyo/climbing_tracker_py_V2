@@ -9,24 +9,70 @@ class FilterService:
     """Service de filtrage des données"""
     
     @staticmethod
-    def filter_routes(routes):
-        """Applique les filtres aux voies"""
+    def filter_routes(routes, attempts=None):
+        """
+        Applique les filtres et tris aux voies.
+        
+        Args:
+            routes: liste des routes
+            attempts: liste des tentatives (optionnel, pour tri par nombre de tentatives)
+        """
         filtered = routes.copy()
         
         # Filtre par couleurs
         if st.session_state.filter_colors:
             filtered = [r for r in filtered if r["color"] in st.session_state.filter_colors]
         
-        # Filtre par plage de cotations (nouveau)
+        # Filtre par plage de cotations
         min_idx = GRADES.index(st.session_state.filter_min_grade)
         max_idx = GRADES.index(st.session_state.filter_max_grade)
         filtered = [r for r in filtered 
                     if r["grade"] in GRADES[min_idx:max_idx+1]]
         
-        #Filtre par zone de la salle
+        # Filtre par zone de la salle
         if st.session_state.filter_space:
             filtered = [r for r in filtered if r["space"] in st.session_state.filter_space]
 
+        # Tri
+        sort_by = st.session_state.get("sort_by", "Cotation")
+        sort_direction = st.session_state.get("sort_direction", "Décroissant")
+        reverse = (sort_direction == "Décroissant")
+        
+        if sort_by == "Cotation":
+            # Tri par cotation (index dans GRADES)
+            filtered = sorted(
+                filtered,
+                key=lambda r: GRADES.index(r["grade"]) if r["grade"] in GRADES else -1,
+                reverse=reverse
+            )
+        
+        elif sort_by == "Relais":
+            # Tri par numéro de relais (sector)
+            # Les routes sans sector sont mises à la fin
+            filtered = sorted(
+                filtered,
+                key=lambda r: (r.get("sector") is None, r.get("sector") or 0),
+                reverse=reverse
+            )
+        
+        elif sort_by == "Tentatives":
+            # Tri par nombre de tentatives
+            if attempts is not None:
+                # Compter les tentatives par route
+                attempts_count = {}
+                for attempt in attempts:
+                    route_id = attempt["route_id"]
+                    attempts_count[route_id] = attempts_count.get(route_id, 0) + 1
+                
+                # Trier par nombre de tentatives
+                filtered = sorted(
+                    filtered,
+                    key=lambda r: attempts_count.get(r["id"], 0),
+                    reverse=reverse
+                )
+            else:
+                # Si pas de tentatives fournies, pas de tri
+                pass
 
         return filtered
     

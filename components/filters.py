@@ -122,3 +122,32 @@ class FilterComponents:
         if selected_space != st.session_state.filter_space:
             st.session_state.filter_space = selected_space
             st.rerun()
+    
+    @staticmethod
+    def route_sort():
+        """Composant de tri pour les routes"""
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            sort_options = ["Cotation", "Relais", "Tentatives"]
+            selected_sort = st.selectbox(
+                "Trier par",
+                options=sort_options,
+                index=sort_options.index(st.session_state.sort_by)
+            )
+            
+            if selected_sort != st.session_state.sort_by:
+                st.session_state.sort_by = selected_sort
+                st.rerun()
+        
+        with col2:
+            direction_options = ["Croissant", "Décroissant"]
+            selected_direction = st.selectbox(
+                "Ordre",
+                options=direction_options,
+                index=direction_options.index(st.session_state.sort_direction)
+            )
+            
+            if selected_direction != st.session_state.sort_direction:
+                st.session_state.sort_direction = selected_direction
+                st.rerun()

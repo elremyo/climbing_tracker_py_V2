@@ -1,10 +1,10 @@
 import streamlit as st
-from data import get_routes, add_route, update_route
+from data import get_routes, get_attempts, add_route, update_route
 from services.session_state_service import SessionStateService
 from services.filter_service import FilterService
 from components.filters import FilterComponents
 from components.cards import RouteCard
-from components.dialogs import add_route_dialog,edit_route_dialog
+from components.dialogs import add_route_dialog, edit_route_dialog
 from services.auth_service import AuthService
 
 # Protection : rediriger vers login si non connecté
@@ -19,27 +19,36 @@ SessionStateService.init_routes_state()
 
 # Chargement des données
 routes = get_routes()
-filtered_routes = FilterService.filter_routes(routes)
+attempts = get_attempts()
+filtered_routes = FilterService.filter_routes(routes, attempts)
 
 # Header
 st.subheader(f"Mes voies ({len(filtered_routes)}/{len(routes)})")
 
-# Boutton d'ajout
+# Bouton d'ajout
 if st.button("Ajouter une voie", icon=":material/add:", use_container_width=True, type="primary"):
     def save_handler(name, grade, color):
         add_route(name, grade, color)
         st.session_state.show_add_success = True    
     add_route_dialog(save_handler)
 
-
-# Filtres
-with st.expander("Filtres"):
+# Section Filtres et Tri
+with st.expander("Filtres et tri"):
+    # Filtres
+    st.markdown("**Filtres**")
     FilterComponents.colors_multiselect()
     FilterComponents.grades_range_slider()
     FilterComponents.space_select()
-
     
-    if st.button("Réinitialiser les filtres",icon=":material/replay:", use_container_width=True):
+    st.divider()
+    
+    # Tri
+    st.markdown("**Tri**")
+    FilterComponents.route_sort()
+    
+    st.divider()
+    
+    if st.button("Réinitialiser", icon=":material/replay:", use_container_width=True):
         SessionStateService.reset_routes_filters()
         st.rerun()
 

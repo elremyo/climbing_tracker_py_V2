@@ -25,11 +25,8 @@ class SessionStateService:
         defaults = {
             "show_add_success": False,
             "show_edit_success": False,
-            "show_archive_success": False,
-            "show_unarchive_success": False,
             "show_delete_success": False,
             "filter_colors": [],
-            "show_archived": True,
             "filter_min_grade": GRADES[0],
             "filter_max_grade": GRADES[-1],
         }
@@ -57,7 +54,6 @@ class SessionStateService:
     def reset_routes_filters():
         """Reset all routes filters"""
         st.session_state.filter_colors = []
-        st.session_state.show_archived = True
         st.session_state.filter_min_grade = GRADES[0]
         st.session_state.filter_max_grade = GRADES[-1]
     

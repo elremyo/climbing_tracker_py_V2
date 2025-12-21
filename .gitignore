@@ -15,8 +15,7 @@ venv/
 .streamlit/
 
 #Script d'import (optionnel)
-import_oblyk_routes.py
-oblyk_routes_backup.json
+import_routes/
 
 # Autre
 run.bat

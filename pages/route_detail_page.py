@@ -1,6 +1,6 @@
 import streamlit as st
 from data import get_routes, get_attempts, add_attempt, update_attempt, delete_attempt
-from components.dialogs import add_attempt_dialog, edit_attempt_dialog, confirm_archive_dialog
+from components.dialogs import add_attempt_dialog, edit_attempt_dialog
 from services.route_stats_service import RouteStatsService
 from components.cards import AttemptCard
 from utils.constants import ROUTE_COLORS
@@ -53,8 +53,7 @@ with st.container(border=False, vertical_alignment="bottom", horizontal=True, ga
             st.switch_page("pages/routes_page.py")
 
     color_emoji = ROUTE_COLORS.get(route["color"], "❓")
-    archived_badge = " :red-badge[Archivée]" if route.get("archived") else ""
-    st.subheader(f"{color_emoji} {route['grade']} - {route['name']}{archived_badge}")
+    st.subheader(f"{color_emoji} {route['grade']} - {route['name']}")
 
 
 # ===== STATISTIQUES PRINCIPALES =====
@@ -92,20 +91,11 @@ if route_attempts:
                 edit_attempt_dialog(a, [route], save_handler)
             return handler
 
-        def make_delete_handler(a):
-            def handler():
-                def on_confirm():
-                    delete_attempt(a["id"])
-                    st.session_state.show_attempt_delete_success = True
-                confirm_archive_dialog(f"tentative du {format_date_fr(a['date'])}", on_confirm)
-            return handler
-
         AttemptCard.render(
             attempt,
             route,
             show_route_info=False,
-            on_edit=make_edit_handler(attempt),
-            on_delete=make_delete_handler(attempt)
+            on_edit=make_edit_handler(attempt)
         )
 
 else:
@@ -119,7 +109,3 @@ if st.session_state.show_attempt_add_success:
 if st.session_state.show_attempt_edit_success:
     st.toast("Tentative modifiée !", icon="✅")
     st.session_state.show_attempt_edit_success = False
-
-if st.session_state.show_attempt_delete_success:
-    st.toast("Tentative supprimée !", icon="✅")
-    st.session_state.show_attempt_delete_success = False

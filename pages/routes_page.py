@@ -1,5 +1,5 @@
 import streamlit as st
-from data import get_routes, add_route, update_route, archive_route, unarchive_route
+from data import get_routes, add_route, update_route
 from services.session_state_service import SessionStateService
 from services.filter_service import FilterService
 from components.filters import FilterComponents
@@ -37,14 +37,6 @@ with st.expander("Filtres"):
     FilterComponents.colors_multiselect()
     FilterComponents.grades_range_slider()
     
-    show_archived = st.checkbox(
-        "Afficher les voies archivées",
-        value=st.session_state.show_archived
-    )
-    if show_archived != st.session_state.show_archived:
-        st.session_state.show_archived = show_archived
-        st.rerun()
-    
     if st.button("Réinitialiser les filtres",icon=":material/replay:", use_container_width=True):
         SessionStateService.reset_routes_filters()
         st.rerun()
@@ -67,32 +59,11 @@ if filtered_routes:
                     st.session_state.show_edit_success = True
                 edit_route_dialog(r, save_handler)
             return handler
-        
-        def make_archive_handler(r):
-            def handler():
-                from components.dialogs import confirm_archive_dialog
-                
-                # Callback de confirmation
-                def on_confirm():
-                    archive_route(r["id"])
-                    st.session_state.show_archive_success = True
-                
-                confirm_archive_dialog(f"{r['grade']} {r['name']}", on_confirm)
-            return handler
-        
-        def make_unarchive_handler(r):
-            def handler():
-                unarchive_route(r["id"])
-                st.session_state.show_unarchive_success = True
-                st.rerun()
-            return handler
-        
+
         RouteCard.render(
             route,
             on_click=make_click_handler(route),
-            on_edit=make_edit_handler(route),
-            on_archive=make_archive_handler(route),
-            on_unarchive=make_unarchive_handler(route)
+            on_edit=make_edit_handler(route)
         )
 else:
     if routes:
@@ -108,11 +79,3 @@ if st.session_state.show_add_success:
 if st.session_state.show_edit_success:
     st.toast("Voie modifiée !", icon="✅")
     st.session_state.show_edit_success = False
-
-if st.session_state.show_archive_success:
-    st.toast("Voie archivée !", icon="✅")
-    st.session_state.show_archive_success = False
-
-if st.session_state.show_unarchive_success:
-    st.toast("Voie réactivée !", icon="✅")
-    st.session_state.show_unarchive_success = False

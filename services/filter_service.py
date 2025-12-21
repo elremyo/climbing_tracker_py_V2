@@ -22,11 +22,6 @@ class FilterService:
         max_idx = GRADES.index(st.session_state.filter_max_grade)
         filtered = [r for r in filtered 
                     if r["grade"] in GRADES[min_idx:max_idx+1]]
-
-        # Filtre archivées
-        if not st.session_state.show_archived:
-            filtered = [r for r in filtered if not r.get("archived", False)]
-        
         return filtered
     
     @staticmethod

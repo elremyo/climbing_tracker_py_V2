@@ -85,31 +85,11 @@ if filtered_attempts:
                 edit_attempt_dialog(attempt, routes, save_handler)
             return handler
         
-        def make_delete_handler(attempt, route_obj):
-            def handler():
-                # Import de la fonction de confirmation
-                from components.dialogs import confirm_archive_dialog
-                
-                # Créer le nom d'affichage pour la modale
-                if route_obj:
-                    display_name = f"{route_obj['grade']} {route_obj['name']}"
-                else:
-                    display_name = "cette tentative"
-                
-                # Callback de confirmation
-                def on_confirm():
-                    delete_attempt(attempt["id"])
-                    st.session_state.show_attempt_delete_success = True
-                
-                confirm_archive_dialog(display_name, on_confirm)
-            return handler
-        
         AttemptCard.render(
             a,
             route,
-            on_edit=make_edit_handler(a, route),
-            on_delete=make_delete_handler(a, route)
-        )
+            on_edit=make_edit_handler(a, route)
+            )
 else:
     if attempts:
         st.info("Aucune tentative ne correspond aux filtres sélectionnés.")

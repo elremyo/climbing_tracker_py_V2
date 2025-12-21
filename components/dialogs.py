@@ -79,21 +79,3 @@ def edit_attempt_dialog(attempt, routes, on_save):
         st.rerun()
 
     AttemptForm.render(routes=routes, attempt=attempt, on_submit=handle_submit, on_cancel=handle_cancel)
-
-@st.dialog("Confirmer l'archivage")
-def confirm_archive_dialog(item_name, on_confirm):
-    """
-    Modal de confirmation de l'archivage.
-    
-    Args:
-        item_name: nom de l'élément à archiver
-        on_confirm: callback() appelé si l'utilisateur confirme
-    """
-    st.markdown(f"Es-tu sûr de vouloir archiver **{item_name}** ?")
-
-    if st.button("Archiver", use_container_width=True, type="primary"):
-        on_confirm()
-        st.rerun()
-
-    if st.button("Annuler", use_container_width=True, type="secondary"):
-        st.rerun()

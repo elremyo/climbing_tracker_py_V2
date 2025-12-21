@@ -9,29 +9,24 @@ class RouteCard:
     """Affichage d'une voie"""
     
     @staticmethod
-    def render(route, on_edit=None, on_archive=None, on_unarchive=None, on_click=None):
+    def render(route, on_edit=None, on_click=None):
         """
         Affiche une carte de voie.
         
         Args:
             route: dict de la voie
             on_edit: callback() appelé au clic sur éditer
-            on_archive: callback() appelé au clic sur archiver
-            on_unarchive: callback() appelé au clic sur réactiver
             on_click: callback() appelé au clic sur la carte (NOUVEAU)
         """
         color_emoji = ROUTE_COLORS.get(route["color"], "❓")
-        archived = route.get("archived", False)
         
         display = f"{color_emoji} **{route['grade']}** - :small[{route['name']}]"
-        if archived:
-            display = f''':grey[{display + " - :material/lock: _Archivée_"}]''' 
 
         with st.container(horizontal=True, border=True, vertical_alignment="center"):
             st.markdown(display,text_alignment="left")
             
             # Boutons d'actions
-            if on_click and not archived:
+            if on_click:
                 if st.button("", key=f"route_{route.get('id')}_click",icon=":material/search:", help="Détail",type="tertiary"):
                     on_click()
 
@@ -39,17 +34,6 @@ class RouteCard:
                 btn_key = f"route_{route.get('id')}_edit"
                 if st.button("", key=btn_key, icon=":material/edit:", help="Éditer", type="tertiary"):
                     on_edit()
-            
-            if archived:
-                if on_unarchive:
-                    btn_key = f"route_{route.get('id')}_unarchive"
-                    if st.button("", key=btn_key, icon=":material/lock_reset:", help="Réactiver", type="tertiary"):
-                        on_unarchive()
-            else:
-                if on_archive:
-                    btn_key = f"route_{route.get('id')}_archive"
-                    if st.button("", key=btn_key, icon=":material/archive:", help="Archiver", type="tertiary"):
-                        on_archive()
 
 
 class AttemptCard:

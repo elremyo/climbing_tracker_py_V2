@@ -32,23 +32,16 @@ with st.container(horizontal=True):
     most_recent = max(attempts, key=lambda a: a["date"])
     st.metric("📅 Dernière tentative", format_date_fr(most_recent["date"]), border=True)
 
-    # Voie la plus tentée
-    route, count = StatsService.get_most_attempted_route(attempts, routes)
-    if route:
-        st.metric("💪 Voie la plus tentée", f"{route['name']} ({count} fois)", border=True)
-    else:
-        st.metric("💪 Voie la plus tentée", f"Voie supprimée ({count} fois)", border=True)
-
     # Voie la plus difficile réussie
     attempt, route = StatsService.get_hardest_completed_route(attempts, routes)
     if route:
         st.metric("🏆Meilleure difficulté", f"{route['grade']}", border=True)
 
-    # Statistiques par niveau
-    st.subheader("Statistiques par niveau de difficulté")
-    grade_stats = StatsService.calculate_grade_stats(attempts, routes)
-    if grade_stats:
-        for grade, (total, successful, rate) in grade_stats.items():
-            st.markdown(f"**{grade}** : Réussi {successful} sur {total} -- {rate:.1f} %")
-    else:
-        st.info("Aucune donnée par niveau de difficulté pour le moment.")
+# Statistiques par niveau
+st.subheader("Statistiques par niveau de difficulté")
+grade_stats = StatsService.calculate_grade_stats(attempts, routes)
+if grade_stats:
+    for grade, (total, successful, rate) in grade_stats.items():
+        st.markdown(f"**{grade}** : Réussi {successful} sur {total} -- {rate:.1f} %")
+else:
+    st.info("Aucune donnée par niveau de difficulté pour le moment.")

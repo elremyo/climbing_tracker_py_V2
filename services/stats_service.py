@@ -17,17 +17,6 @@ class StatsService:
         return (successful / len(attempts)) * 100
     
     @staticmethod
-    def get_most_attempted_route(attempts, routes):
-        """Trouve la voie la plus tentée"""
-        if not attempts:
-            return None, 0
-        
-        route_counter = Counter(a["route_id"] for a in attempts)
-        most_common_route_id, count = route_counter.most_common(1)[0]
-        route = next((r for r in routes if r["id"] == most_common_route_id), None)
-        return route, count
-    
-    @staticmethod
     def get_hardest_completed_route(attempts, routes):
         """Trouve la voie la plus difficile réussie"""
         successful_attempts_with_routes = []

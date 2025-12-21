@@ -79,3 +79,21 @@ def edit_attempt_dialog(attempt, routes, on_save):
         st.rerun()
 
     AttemptForm.render(routes=routes, attempt=attempt, on_submit=handle_submit, on_cancel=handle_cancel)
+
+@st.dialog("Confirmer la suppression")
+def confirm_delete_dialog(item_name, on_confirm):
+    """
+    Modal de confirmation de la suppression.
+    
+    Args:
+        item_name: nom de l'élément à supprimer
+        on_confirm: callback() appelé si l'utilisateur confirme
+    """
+    st.markdown(f"Es-tu sûr de vouloir supprimer **{item_name}** ?")
+
+    if st.button("Supprimer", use_container_width=True, type="primary"):
+        on_confirm()
+        st.rerun()
+
+    if st.button("Annuler", use_container_width=True, type="secondary"):
+        st.rerun()

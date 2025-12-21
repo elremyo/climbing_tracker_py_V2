@@ -85,7 +85,11 @@ class FilterComponents:
             format_func=lambda c: f"{ROUTE_COLORS[c]} {c}",
             placeholder="Toutes les couleurs"
         )
-        st.session_state.filter_colors = selected_colors
+        
+        # Comparer et rerun si changement
+        if selected_colors != st.session_state.filter_colors:
+            st.session_state.filter_colors = selected_colors
+            st.rerun()
 
     @staticmethod
     def grades_range_slider():
@@ -110,6 +114,11 @@ class FilterComponents:
         """Select pour filtrer par zone"""
         selected_space = st.pills(
             "Filtrer par zone",
-            options=list(ROUTE_SPACES)
+            options=list(ROUTE_SPACES),
+            default=st.session_state.filter_space
         )
-        st.session_state.filter_space = selected_space
+        
+        # Comparer et rerun si changement
+        if selected_space != st.session_state.filter_space:
+            st.session_state.filter_space = selected_space
+            st.rerun()

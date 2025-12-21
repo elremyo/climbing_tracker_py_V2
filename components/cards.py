@@ -19,11 +19,18 @@ class RouteCard:
             on_click: callback() appelé au clic sur la carte (NOUVEAU)
         """
         color_emoji = ROUTE_COLORS.get(route["color"], "❓")
-        
-        display = f"{color_emoji} **{route['grade']}** - :small[{route['name']}]"
+        route_grade = route["grade"]
+        route_name = f""" ({route["name"]})""" if route.get("name") else ""
+        route_sector = route.get("sector")
+        route_space = route.get("space")
+
+        display_route = f"{color_emoji} **{route_grade}** - {route_space} :small[{route_name}]"
+        display_sector = f":small[ Relais n°{route_sector}]" if route_sector else ""
 
         with st.container(horizontal=True, border=True, vertical_alignment="center"):
-            st.markdown(display,text_alignment="left")
+            with st.container():
+                st.markdown(display_route,text_alignment="left")
+                st.markdown(display_sector,text_alignment="left")
             
             # Boutons d'actions
             if on_click:

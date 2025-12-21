@@ -9,14 +9,15 @@ class RouteCard:
     """Affichage d'une voie"""
     
     @staticmethod
-    def render(route, on_edit=None, on_click=None):
+    def render(route, on_edit=None, on_click=None, attempts_count=0):
         """
         Affiche une carte de voie.
         
         Args:
             route: dict de la voie
             on_edit: callback() appelé au clic sur éditer
-            on_click: callback() appelé au clic sur la carte (NOUVEAU)
+            on_click: callback() appelé au clic sur la carte
+            attempts_count: nombre de tentatives sur cette voie
         """
         color_emoji = ROUTE_COLORS.get(route["color"], "❓")
         route_grade = route["grade"]
@@ -26,15 +27,21 @@ class RouteCard:
 
         display_route = f"{color_emoji} **{route_grade}** - {route_space} :small[{route_name}]"
         display_sector = f":small[ Relais n°{route_sector}]" if route_sector else ""
+        
+        # Affichage du nombre de tentatives
+        if attempts_count > 0:
+            display_attempts = f" :violet-badge[{attempts_count} tentative{'s' if attempts_count > 1 else ''}]"
+        else:
+            display_attempts = ""
 
         with st.container(horizontal=True, border=True, vertical_alignment="center"):
             with st.container():
-                st.markdown(display_route,text_alignment="left")
-                st.markdown(display_sector,text_alignment="left")
+                st.markdown(display_route, text_alignment="left")
+                st.markdown(display_sector + display_attempts, text_alignment="left")
             
             # Boutons d'actions
             if on_click:
-                if st.button("", key=f"route_{route.get('id')}_click",icon=":material/search:", help="Détail",type="tertiary"):
+                if st.button("", key=f"route_{route.get('id')}_click", icon=":material/search:", help="Détail", type="tertiary"):
                     on_click()
 
             if on_edit:

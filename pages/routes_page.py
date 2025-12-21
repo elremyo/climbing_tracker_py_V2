@@ -57,6 +57,9 @@ st.divider()
 # Liste des voies
 if filtered_routes:
     for route in filtered_routes:
+        # Calculer le nombre de tentatives pour cette voie
+        route_attempts_count = sum(1 for a in attempts if a["route_id"] == route["id"])
+        
         def make_click_handler(r):
             def handler():
                 st.query_params.from_dict({"route_id": str(r["id"])})
@@ -74,7 +77,8 @@ if filtered_routes:
         RouteCard.render(
             route,
             on_click=make_click_handler(route),
-            on_edit=make_edit_handler(route)
+            on_edit=make_edit_handler(route),
+            attempts_count=route_attempts_count
         )
 else:
     if routes:

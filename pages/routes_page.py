@@ -36,6 +36,8 @@ if st.button("Ajouter une voie", icon=":material/add:", use_container_width=True
 with st.expander("Filtres"):
     FilterComponents.colors_multiselect()
     FilterComponents.grades_range_slider()
+    FilterComponents.space_select()
+
     
     if st.button("Réinitialiser les filtres",icon=":material/replay:", use_container_width=True):
         SessionStateService.reset_routes_filters()

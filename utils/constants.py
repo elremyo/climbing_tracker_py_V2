@@ -18,3 +18,11 @@ GRADES = [
     "7a", "7a+", "7b", "7b+", "7c", "7c+",
     "8a", "8a+", "8b", "8b+", "8c", "8c+"
 ]
+
+ROUTE_SPACES = [
+    "Grand Dévers",
+    "Face Nord",
+    "Face Sud",
+    "Terrasse ",
+    "Pan"
+]

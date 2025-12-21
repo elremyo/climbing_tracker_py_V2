@@ -22,6 +22,12 @@ class FilterService:
         max_idx = GRADES.index(st.session_state.filter_max_grade)
         filtered = [r for r in filtered 
                     if r["grade"] in GRADES[min_idx:max_idx+1]]
+        
+        #Filtre par zone de la salle
+        if st.session_state.filter_space:
+            filtered = [r for r in filtered if r["space"] in st.session_state.filter_space]
+
+
         return filtered
     
     @staticmethod

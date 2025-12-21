@@ -29,6 +29,7 @@ class SessionStateService:
             "filter_colors": [],
             "filter_min_grade": GRADES[0],
             "filter_max_grade": GRADES[-1],
+            "filter_space":[]
         }
         for key, value in defaults.items():
             if key not in st.session_state:
@@ -54,6 +55,7 @@ class SessionStateService:
     def reset_routes_filters():
         """Reset all routes filters"""
         st.session_state.filter_colors = []
+        st.session_state.filter_space = []
         st.session_state.filter_min_grade = GRADES[0]
         st.session_state.filter_max_grade = GRADES[-1]
     

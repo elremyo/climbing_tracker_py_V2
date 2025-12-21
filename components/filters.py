@@ -2,7 +2,7 @@
 Composants de filtrage réutilisables.
 """
 import streamlit as st
-from utils.constants import ROUTE_COLORS, GRADES
+from utils.constants import ROUTE_COLORS, GRADES, ROUTE_SPACES
 
 class FilterComponents:
     """Composants UI pour les filtres"""
@@ -103,3 +103,13 @@ class FilterComponents:
             st.session_state.filter_min_grade = min_grade
             st.session_state.filter_max_grade = max_grade
             st.rerun()
+
+
+    @staticmethod
+    def space_select():
+        """Select pour filtrer par zone"""
+        selected_space = st.pills(
+            "Filtrer par zone",
+            options=list(ROUTE_SPACES)
+        )
+        st.session_state.filter_space = selected_space

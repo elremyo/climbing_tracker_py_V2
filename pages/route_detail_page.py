@@ -46,14 +46,18 @@ route_attempts = [a for a in attempts if str(a["route_id"]) == str(route_id)]
 stats = RouteStatsService.get_route_stats(route_attempts)
 
 # ===== HEADER =====
-st.subheader(" Détail de la voie")
-
 with st.container(border=False, vertical_alignment="bottom", horizontal=True, gap="small"):
     if st.button("", icon=":material/arrow_back:", help="Retour", type="tertiary"):
             st.switch_page("pages/routes_page.py")
 
     color_emoji = ROUTE_COLORS.get(route["color"], "❓")
-    st.subheader(f"{color_emoji} {route['grade']} - {route['name']}")
+    route_grade = route["grade"]
+    route_name = f""" ({route["name"]})""" if route.get("name") else ""
+    route_sector = route.get("sector") if route.get("sector") else None
+    route_space = route.get("space") if route.get("space") else "Espace inconnu"
+
+    st.subheader(f"{color_emoji} {route_grade} - {route_space}{route_name}")
+st.markdown(f"Relais n°{route_sector}" if route_sector else "")
 
 
 # ===== STATISTIQUES PRINCIPALES =====

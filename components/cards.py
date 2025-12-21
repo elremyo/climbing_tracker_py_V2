@@ -62,10 +62,13 @@ class AttemptCard:
         # Infos de la voie
         if show_route_info:
             if route:
-                route_name = route["name"]
                 route_color = ROUTE_COLORS.get(route["color"], "❓")
                 route_grade = route["grade"]
-                route_display = f"{route_color} **{route_grade} {route_name}**"
+                route_name = f""" ({route["name"]})""" if route.get("name") else ""
+                route_sector = route.get("sector")
+                route_space = route.get("space")
+
+                route_display = f"{route_color} **{route_grade}** - {route_space} :small[Relais n°{route_sector}{route_name}]"
             else:
                 route_display = "❓ **Voie supprimée**"
         else:

@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-class SecureCookieManager:
+class CookieManager:
     """Gestion des cookies avec chiffrement"""
     
     _cookie_manager = None

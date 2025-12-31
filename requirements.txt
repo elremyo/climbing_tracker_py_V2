@@ -4,3 +4,4 @@ python-dotenv
 pandas
 streamlit_extras
 extra-streamlit-components
+cryptography

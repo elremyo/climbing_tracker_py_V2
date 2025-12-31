@@ -55,16 +55,6 @@ FilterComponents.status_filter()
 with st.expander("Filtres avancés"):
     FilterComponents.period_filter()
     
-    sort_option = st.radio(
-        "Trier par",
-        ["Plus récent", "Plus ancien"],
-        index=0 if st.session_state.attempt_sort_order == "Plus récent" else 1,
-        horizontal=True
-    )
-    if sort_option != st.session_state.attempt_sort_order:
-        st.session_state.attempt_sort_order = sort_option
-        st.rerun()
-    
     if st.button("Réinitialiser les filtres", icon=":material/replay:",use_container_width=True):
         SessionStateService.reset_attempts_filters()
         st.rerun()

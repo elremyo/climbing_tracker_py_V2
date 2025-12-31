@@ -4,6 +4,7 @@ Service d'authentification avec Supabase Auth.
 import streamlit as st
 from data.supabase_client import supabase
 from services.user_context import UserContext
+from services.cookie_manager import CookieManager
 
 class AuthService:
     """Gestion de l'authentification utilisateur"""
@@ -44,9 +45,22 @@ class AuthService:
             })
             
             if response.user and response.session:
+                # Stocker dans session_state
                 st.session_state.user = response.user
                 st.session_state.session = response.session
-                supabase.auth.set_session(response.session.access_token,response.session.refresh_token)
+                
+                # Stocker dans les cookies pour persistance
+                CookieManager.save_session(
+                    response.session.access_token,
+                    response.session.refresh_token
+                )
+                
+                # Configurer Supabase avec la session
+                supabase.auth.set_session(
+                    response.session.access_token,
+                    response.session.refresh_token
+                )
+                
                 return True, "✅ Connexion réussie !"
             else:
                 return False, "❌ Email ou mot de passe incorrect."
@@ -64,6 +78,7 @@ class AuthService:
             supabase.auth.sign_out()
             st.session_state.user = None
             st.session_state.session = None
+            CookieManager.clear_session()
             return True, "👋 Déconnexion réussie."
         except Exception as e:
             return False, f"❌ Erreur lors de la déconnexion : {str(e)}"
@@ -101,7 +116,68 @@ class AuthService:
         """
         if not UserContext.is_authenticated():
             st.switch_page("pages/login_page.py")
-            st.stop()  # Empêche l'exécution du reste de la page
+            st.stop()
+    
+    @staticmethod
+    def restore_session_from_cookie():
+        """
+        Restaure la session depuis les cookies au démarrage de l'app.
+        À appeler au début de app.py
+        
+        Returns:
+            bool: True si la session a été restaurée avec succès
+        """
+        # Si déjà connecté dans session_state, pas besoin de restaurer
+        if st.session_state.get("user") is not None:
+            return True
+        
+        # Récupérer les tokens depuis les cookies
+        session_data = CookieManager.get_session()
+        
+        if not session_data:
+            return False
+        
+        try:
+            # Tenter de restaurer la session avec les tokens
+            access_token = session_data.get("access_token")
+            refresh_token = session_data.get("refresh_token")
+            
+            if not access_token or not refresh_token:
+                return False
+            
+            # Configurer Supabase avec les tokens
+            supabase.auth.set_session(access_token, refresh_token)
+            
+            # Récupérer l'utilisateur avec le token
+            response = supabase.auth.get_user(access_token)
+            
+            if response.user:
+                # Restaurer dans session_state
+                st.session_state.user = response.user
+                
+                # Récupérer la nouvelle session (peut avoir été rafraîchie)
+                current_session = supabase.auth.get_session()
+                if current_session:
+                    st.session_state.session = current_session
+                    
+                    # Mettre à jour les cookies avec les tokens potentiellement rafraîchis
+                    CookieManager.save_session(
+                        current_session.access_token,
+                        current_session.refresh_token
+                    )
+                
+                return True
+            else:
+                # Token invalide, nettoyer
+                CookieManager.clear_session()
+                return False
+                
+        except Exception as e:
+            # En cas d'erreur, nettoyer les cookies invalides
+            CookieManager.clear_session()
+            st.session_state.user = None
+            st.session_state.session = None
+            return False
     
     @staticmethod
     def check_session():
@@ -115,11 +191,15 @@ class AuthService:
                 response = supabase.auth.get_user(session.access_token)
                 if response.user:
                     st.session_state.user = response.user
-                    supabase.auth.set_session(session.access_token,session.refresh_token)
+                    supabase.auth.set_session(
+                        session.access_token,
+                        session.refresh_token
+                    )
                     return True
             return False
         except Exception:
             # Session expirée ou invalide
             st.session_state.user = None
             st.session_state.session = None
+            CookieManager.clear_session()
             return False

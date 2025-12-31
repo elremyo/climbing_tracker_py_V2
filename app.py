@@ -15,6 +15,9 @@ st.set_page_config(
 # Initialiser l'état global de l'app (auth, etc.)
 SessionStateService.init_app_state()
 
+# IMPORTANT : Restaurer la session depuis les cookies au démarrage
+AuthService.restore_session_from_cookie()
+
 # Vérifier la session
 AuthService.check_session()
 
@@ -30,10 +33,11 @@ pages = [
     st.Page("pages/attempts_page.py", title="Tentatives", icon="🎯"),
     st.Page("pages/route_detail_page.py", title="Détail voie", icon="🔍")
 ]
+
 # Afficher le top menu personnalisé
 display_top_menu()
 
-current = st.navigation(pages, position="hidden")  # Permet à st.switch_page de fonctionner
+current = st.navigation(pages, position="hidden")
 current.run()
 
 # Afficher le menu latéral personnalisé
